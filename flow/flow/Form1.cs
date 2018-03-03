@@ -8,13 +8,14 @@ namespace flow
 {
 	public partial class Form1 : Form
 	{
+        // Nema potreba da e Dictionary, moze da e obichen enum
 		Dictionary<int, Color> colors = new Dictionary<int, Color>
 		{
 			{0, Color.White },
 			{1, Color.Red },
 			{2, Color.Green },
-			{3,Color.Blue },
-			{4,Color.Yellow },
+			{3, Color.Blue },
+			{4, Color.Yellow },
 			{5, Color.Orange }
 		};
 		private static Label[][] matrix;
@@ -69,15 +70,26 @@ namespace flow
 				}
 			};
 			for (int i = 0; i < 5; i++)
-				for (int j = 0; j < 5; j++)
-					matrix[i][j].Text = "0";
-			matrix[0][0].Text = matrix[4][1].Text = "1";
-			matrix[0][2].Text = matrix[3][1].Text = "2";
-			matrix[1][2].Text = matrix[4][2].Text = "3";
-			matrix[0][4].Text = matrix[3][3].Text = "4";
-			matrix[1][4].Text = matrix[4][3].Text = "5";
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    matrix[i][j].BackColor = colors[0];
+                    matrix[i][j].Text = "";
+                }
+            }
 
-			timer = new Timer();
+            matrix[0][0].BackColor = matrix[4][1].BackColor = colors[1];
+			matrix[1][2].BackColor = matrix[4][2].BackColor = colors[3];
+			matrix[0][2].BackColor = matrix[3][1].BackColor = colors[2];
+			matrix[0][4].BackColor = matrix[3][3].BackColor = colors[4];
+			matrix[1][4].BackColor = matrix[4][3].BackColor = colors[5];
+            matrix[0][0].Text = matrix[4][1].Text = "1";
+            matrix[1][2].Text = matrix[4][2].Text = "3";
+            matrix[0][2].Text = matrix[3][1].Text = "2";
+            matrix[0][4].Text = matrix[3][3].Text = "4";
+            matrix[1][4].Text = matrix[4][3].Text = "5";
+
+            timer = new Timer();
 			timer.Elapsed += mouse_down;
 		}
 
@@ -120,7 +132,7 @@ namespace flow
 		private TableLayoutPanelCellPosition GetCellPosotion(TableLayoutPanel panel)
 		{
 			//mouse position
-			Point p = panel.PointToClient(Control.MousePosition);
+			Point p = panel.PointToClient(MousePosition);
 			//Cell position
 			TableLayoutPanelCellPosition pos = new TableLayoutPanelCellPosition(0, 0);
 			//Panel size.
