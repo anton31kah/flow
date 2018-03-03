@@ -46,5 +46,15 @@ namespace flow
 		{
 			button1_Click(sender, e);
 		}
-    }
+
+		private void Form2_MouseMove(object sender, MouseEventArgs e)
+		{
+			label1.Text = $@"{e.X} {e.Y}";
+			//label2.Text = 
+			if (int.TryParse(textBox1.Text, out int lvl))
+				label2.Text = Levels.levels5[lvl - 1].GetColAndRowUnderMouse(e.X, e.Y).ToString();
+			else
+				label2.Text = Levels.levels5[1].GetColAndRowUnderMouse(e.X, e.Y).ToString();
+		}
+	}
 }

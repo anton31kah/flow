@@ -62,5 +62,36 @@ namespace flow
             }
             //formGraphics.Dispose();
         }
+
+		public Cell GetCellUnderMouse(int x, int y)
+		{
+			int col = 0;
+			int row = 0;
+			int cellWidth = width / size;
+			for (int i = cellWidth; i < width; i += cellWidth)
+				if (x > i && x < i + cellWidth)
+					col++;
+			for (int i = cellWidth; i < height; i += cellWidth)
+				if (y > i && y < i + cellWidth)
+					row++;
+			return Cells[row][col];
+		}
+
+		public Point GetColAndRowUnderMouse(int x, int y)
+		{
+			int col = 0;
+			int row = 0;
+			int cellWidth = width / size;
+
+			//if (x > )
+
+			//for (int i = cellWidth; i < width; i += cellWidth)
+			//	if (/*x > i && */x < i + cellWidth)
+			//		col++;
+			//for (int i = cellWidth; i < height; i += cellWidth)
+			//	if (/*y > i && */y < i + cellWidth)
+			//		row++;
+			return new Point(col, row);
+		}
     }
 }
