@@ -21,17 +21,30 @@ namespace flow
 		{
 			
 		}
+
         private void button1_Click(object sender, EventArgs e)
         {
             Graphics formGraphics;
             formGraphics = this.CreateGraphics();
 			//formGraphics.FillRectangle(myBrush, new Rectangle(0, 0, 200, 300));
 			//formGraphics.Dispose();
-			int.TryParse(textBox1.Text, out int lvl);
-            Levels.levels5[lvl - 1].formGraphics = formGraphics;
-            Levels.levels5[lvl - 1].Draw();
-            //Grid grid = new Grid(5, 500, 500, formGraphics);
+			if (int.TryParse(textBox1.Text, out int lvl))
+			{
+				Levels.levels5[lvl - 1].formGraphics = formGraphics;
+				Levels.levels5[lvl - 1].Draw();
+			}
+			else
+			{
+				Levels.levels5[1].formGraphics = formGraphics;
+				Levels.levels5[1].Draw();
+			}
+			//Grid grid = new Grid(5, 500, 500, formGraphics);
             //grid.Draw();
         }
+
+		public void draw(object sender, EventArgs e)
+		{
+			button1_Click(sender, e);
+		}
     }
 }

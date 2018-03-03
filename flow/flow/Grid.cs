@@ -51,12 +51,14 @@ namespace flow
                 {
                     var cell = Cells[i][j];
                     formGraphics.FillRectangle(new SolidBrush(Cell.colors[0]), new Rectangle(cell.x, cell.y, cell.width, cell.height));
-                }
+					formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(cell.x, cell.y, cell.width, cell.height));
+				}
             }
             foreach (Cell cell in initialCells)
             {
                 brush.Color = cell.color;
                 formGraphics.FillRectangle(brush, new Rectangle(cell.x, cell.y, cell.width, cell.height));
+				formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(cell.x, cell.y, cell.width, cell.height));
             }
             //formGraphics.Dispose();
         }

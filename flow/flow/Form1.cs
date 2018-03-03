@@ -89,6 +89,8 @@ namespace flow
             matrix[0][4].Text = matrix[3][3].Text = "4";
             matrix[1][4].Text = matrix[4][3].Text = "5";
 
+			label8.Text = "click";
+
             timer = new Timer();
 			timer.Elapsed += mouse_down;
 		}
@@ -208,6 +210,13 @@ namespace flow
 		private void label1_MouseUp(object sender, MouseEventArgs e)
 		{
 			tableLayoutPanel1_MouseUp(sender, e);
+		}
+
+		private void label8_Click(object sender, System.EventArgs e)
+		{
+			Form2 form2 = new Form2();
+			form2.Show();
+			form2.draw(sender, e);
 		}
 	}
 }
