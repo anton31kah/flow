@@ -20,8 +20,8 @@ namespace flow
         private Cell[][] Cells;
         private List<Cell> initialCells;
         private int width { get; set; }
-        private int height { get; set; }
-        private int size { get; set; }
+		private int height { get; set; }
+		private int size { get; set; }
         public Graphics formGraphics { get; set; }
 
         public Grid(int n, int width, int height, List<Cell> initialCells = null)
