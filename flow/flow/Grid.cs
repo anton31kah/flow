@@ -111,7 +111,7 @@ namespace flow
 
 		public bool isInitinal(Cell cell)
 		{
-			return initialCells.Contains(cell);
+            return cell.IsInitial;
 		}
 	}
 }

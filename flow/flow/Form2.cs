@@ -37,7 +37,7 @@ namespace flow
 				//label5.Text = currentGrid.Cells[0][4].color.ToString();
 				//label5.Text = currentGrid.GetCellUnderMouse(currentPoint.X, currentPoint.Y).color.ToString();
 				
-				if (currentCell != startingCell)
+				if (currentCell != startingCell && !currentCell.IsInitial)
 				{
 					currentCell.Color = startingCell.Color;
 					currentGrid.DrawnCells.Add(currentCell);
