@@ -54,5 +54,9 @@ namespace flow
 			formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(X, Y, Width, Height));
 		}
 
+		public override string ToString()
+		{
+			return Color + " " + IsInitial;
+		}
 	}
 }

@@ -39,9 +39,13 @@ namespace flow
 				Cells[i] = new Cell[n];
 				for (int j = 0; j < n; j++)
 				{
-					//Cells[i][j] = new Cell(i * width / n, j * height / n, i, j, width / n, height / n);
 					Cells[i][j] = new Cell(i, j, n, width);
 				}
+			}
+
+			foreach (Cell initialCell in initialCells)
+			{
+				Cells[initialCell.Row][initialCell.Col] = initialCell;
 			}
 		}
 		/*
