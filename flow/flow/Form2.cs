@@ -25,6 +25,7 @@ namespace flow
         {
             InitializeComponent();
 			timer = new Timer();
+			timer.Interval = 33.3333333333333D; // 30 fps
 			timer.Elapsed += mouse_down;
 		}
 
@@ -38,10 +39,11 @@ namespace flow
 				
 				if (currentCell != startingCell)
 				{
-					currentCell.color = startingCell.color;
+					currentCell.Color = startingCell.Color;
 					currentGrid.DrawnCells.Add(currentCell);
-					label5.Text = currentCell.color.ToString();
-					currentGrid.Draw(currentCell);
+					label5.Text = currentCell.Color.ToString();
+					//currentGrid.Draw(currentCell);
+					currentGrid.Draw();
 					label3.Text = $"{idx++}";
 				}
 				
@@ -54,7 +56,7 @@ namespace flow
 			{
 				timer.Enabled = true;
 				startingCell = currentGrid.GetCellUnderMouse(e.X, e.Y);
-				label4.Text = currentGrid.GetCellUnderMouse(e.X, e.Y).color.ToString();
+				label4.Text = currentGrid.GetCellUnderMouse(e.X, e.Y).Color.ToString();
 				//if (currentGrid.GetCellUnderMouse(e.X, e.Y).color != Color.White)
 				
 			}
