@@ -10,26 +10,28 @@ namespace flow
     class Grid
     {
         /*
-         *  Reactangle(x, y, width, height);
+         *  Reactangle(x, y, Width, height);
          *  x && y -> gore levo tockite
-         *  width -> sirinata na eden cell
+         *  Width -> sirinata na eden cell
          *  height -> visina na eden cell
          * 
          */
 
-        private Cell[][] Cells;
+        public Cell[][] Cells;
         private List<Cell> initialCells;
-        private int width { get; set; }
-		private int height { get; set; }
-		private int size { get; set; }
+		public List<Cell> DrawnCells;
+        private int Width { get; set; }
+		private int Height { get; set; }
+		private int Size { get; set; }
         public Graphics formGraphics { get; set; }
 
         public Grid(int n, int width, int height, List<Cell> initialCells = null)
         {
-            this.width = width;
-            this.height = height;
+			this.DrawnCells = new List<Cell>();
+            this.Width = width;
+            this.Height = height;
             //this.formGraphics = graphics;
-            this.size = n;
+            this.Size = n;
             this.initialCells = initialCells;
             Cells = new Cell[n][];
             for (int i = 0; i < n; i++)
@@ -37,61 +39,65 @@ namespace flow
                 Cells[i] = new Cell[n];
                 for (int j = 0; j < n; j++)
                 {
-                    Cells[i][j] = new Cell(i * width / n, j * height / n, width / n, height / n);
+                    Cells[i][j] = new Cell(i * width / n, j * height / n, i, j, width / n, height / n);
                 }
             }
         }
 
-        public void Draw()
+        public void Draw(Cell specialCell = null)
         {
             SolidBrush brush = new SolidBrush(Cell.colors[0]);
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < Size; i++)
             {
-                for (int j = 0; j < size; j++)
+                for (int j = 0; j < Size; j++)
                 {
                     var cell = Cells[i][j];
-                    formGraphics.FillRectangle(new SolidBrush(Cell.colors[0]), new Rectangle(cell.x, cell.y, cell.width, cell.height));
-					formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(cell.x, cell.y, cell.width, cell.height));
+                    formGraphics.FillRectangle(new SolidBrush(Cell.colors[0]), new Rectangle(cell.y, cell.x, cell.width, cell.height));
+					formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(cell.y, cell.x, cell.width, cell.height));
 				}
             }
-            foreach (Cell cell in initialCells)
+			//if (specialCell != null)
+			//{
+			//	formGraphics.FillRectangle(new SolidBrush(specialCell.color), new Rectangle(specialCell.y, specialCell.x, specialCell.width, specialCell.height));
+			//	formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(specialCell.y, specialCell.x, specialCell.width, specialCell.height));
+			//}
+			foreach (Cell cell in initialCells)
             {
                 brush.Color = cell.color;
-                formGraphics.FillRectangle(brush, new Rectangle(cell.x, cell.y, cell.width, cell.height));
-				formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(cell.x, cell.y, cell.width, cell.height));
+				Cells[cell.row][cell.col] = cell;
+                formGraphics.FillRectangle(brush, new Rectangle(cell.y, cell.x, cell.width, cell.height));
+				formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(cell.y, cell.x, cell.width, cell.height));
             }
+
+			foreach (Cell cell in DrawnCells)
+			{
+				brush.Color = cell.color;
+				Cells[cell.row][cell.col] = cell;
+				formGraphics.FillRectangle(brush, new Rectangle(cell.y, cell.x, cell.width, cell.height));
+				formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(cell.y, cell.x, cell.width, cell.height));
+			}
             //formGraphics.Dispose();
         }
 
 		public Cell GetCellUnderMouse(int x, int y)
 		{
-			int col = 0;
-			int row = 0;
-			int cellWidth = width / size;
-			for (int i = cellWidth; i < width; i += cellWidth)
-				if (x > i && x < i + cellWidth)
-					col++;
-			for (int i = cellWidth; i < height; i += cellWidth)
-				if (y > i && y < i + cellWidth)
-					row++;
+			int cellWidth = Width / Size;
+			int col = x / cellWidth;
+			int row = y / cellWidth;
 			return Cells[row][col];
+		}
+
+		public bool isInitinal(Cell cell)
+		{
+			return initialCells.Contains(cell);
 		}
 
 		public Point GetColAndRowUnderMouse(int x, int y)
 		{
-			int col = 0;
-			int row = 0;
-			int cellWidth = width / size;
-
-			//if (x > )
-
-			//for (int i = cellWidth; i < width; i += cellWidth)
-			//	if (/*x > i && */x < i + cellWidth)
-			//		col++;
-			//for (int i = cellWidth; i < height; i += cellWidth)
-			//	if (/*y > i && */y < i + cellWidth)
-			//		row++;
-			return new Point(col, row);
+			int cellWidth = Width / Size;
+			int col = x / cellWidth;
+			int row = y / cellWidth;
+			return new Point(row, col);
 		}
     }
 }
