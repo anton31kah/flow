@@ -33,6 +33,7 @@ namespace flow
         public int Height { get; set; }
 		public int CountInRowCol { get; set; }
 		public int MaxWidthHeight { get; set; }
+		public bool IsConnected { get; set; }
 
 		public Cell(int row, int col, int countInRowCol, int maxWidthHeight, char colorValue = 'w', bool isInitial = false)
 		{

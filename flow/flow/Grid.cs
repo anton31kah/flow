@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace flow
 {
@@ -48,6 +49,7 @@ namespace flow
 				Cells[initialCell.Row][initialCell.Col] = initialCell;
 			}
 		}
+
 		/*
         public void Draw(Cell specialCell = null)
         {
@@ -88,8 +90,8 @@ namespace flow
 		public void Draw()
 		{
 			foreach (Cell[] cells in Cells)
-				foreach (Cell cell in cells)
-					cell.Draw(formGraphics);
+			foreach (Cell cell in cells)
+				cell.Draw(formGraphics);
 		}
 
 		public Cell GetCellUnderMouse(int x, int y)
@@ -101,7 +103,7 @@ namespace flow
 		}
 
 
-		public Point GetColAndRowUnderMouse(int x, int y)
+		public Point GetRowAndColUnderMouse(int x, int y)
 		{
 			int cellWidth = Width / Size;
 			int col = x / cellWidth;
@@ -111,7 +113,52 @@ namespace flow
 
 		public bool isInitinal(Cell cell)
 		{
-            return cell.IsInitial;
+			return cell.IsInitial;
+		}
+
+		public bool Validate()
+		{
+			//return FixLast() && Cells.All(cells => cells.All(cell => cell.IsConnected));
+			return Cells.All(cells => cells.All(cell => cell.IsConnected));
+		}
+
+		public bool FixLast()
+		{
+			// ova go staviv zosto so IsAdjacent i IsAdjacentOrSame sto gi napraviv se raboti kako sto
+			// treba OSVEN factot deka poslednata cell od sekoj color ne se boj (pagja na isInitial delot
+			// od if-ot vo form2 vo mouse_down) taka da ovoj metod go resava toa, ako site se naboeni, ova
+			// gi pravi poslednite cells connected za da mozi da vrati Validate true
+
+			// NEW UPDATE
+			// nema potreba veke od ovoj metod zosto so previousCell.Color == currentCell.Color vo ifot veke 
+			// go resava ova
+			if (Cells.All(cells => cells.All(cell => cell.Color != Cell.Colors['w'])))
+			{
+				foreach (Cell initialCell in initialCells)
+					initialCell.IsConnected = true;
+				return true;
+			}
+
+			return false;
+		}
+
+		public bool AreAdjacent(Cell one, Cell two)
+		{
+			return Math.Abs(one.Col - two.Col) == 1 || Math.Abs(one.Row - two.Row) == 1;
+		}
+
+		public bool AreAdjacentOrSame(Cell one, Cell two)
+		{
+			return AreAdjacent(one, two) || one.Col - two.Col == 0 && one.Row - two.Row == 0;
+		}
+
+		public void ShowValidation(ListBox listBox1)
+		{
+			listBox1.Items.Clear();
+			foreach (Cell[] cells in Cells)
+			foreach (Cell cell in cells)
+				if (!cell.IsConnected)
+					listBox1.Items.Add($"{cell.Row} {cell.Col}");
 		}
 	}
 }

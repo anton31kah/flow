@@ -19,6 +19,7 @@ namespace flow
 		private Point currentPoint;
 		private long idx = 0;
 		private Cell startingCell;
+		private Cell previousCell;
 		private Cell currentCell;
 
 		public Form2()
@@ -31,22 +32,37 @@ namespace flow
 
 		private void mouse_down(object sender, ElapsedEventArgs e)
 		{
+			label7.Text = startingCell.Color.ToString();
+			label8.Text = previousCell.Color.ToString();
+			label9.Text = currentCell?.Color.ToString();
+			label10.Text = $"{startingCell.Row} {startingCell.Col}";
+			label11.Text = $"{previousCell.Row} {previousCell.Col}";
+			label12.Text = $"{currentCell?.Row} {currentCell?.Col}";
 			if (MouseButtons == MouseButtons.Left)
 			{
 				currentCell = currentGrid.GetCellUnderMouse(currentPoint.X, currentPoint.Y);
 				//label5.Text = currentGrid.Cells[0][4].color.ToString();
 				//label5.Text = currentGrid.GetCellUnderMouse(currentPoint.X, currentPoint.Y).color.ToString();
-				
-				if (currentCell != startingCell && !currentCell.IsInitial)
+
+				label13.Text = (currentCell != startingCell && (!currentCell.IsInitial || previousCell.Color == currentCell.Color) &&
+								(currentGrid.AreAdjacentOrSame(currentCell, startingCell) || currentGrid.AreAdjacent(currentCell, previousCell)))
+					.ToString();
+
+				if (currentCell != startingCell && (!currentCell.IsInitial || previousCell.Color == currentCell.Color) &&
+					(currentGrid.AreAdjacentOrSame(currentCell, startingCell) || currentGrid.AreAdjacent(currentCell, previousCell)))
 				{
 					currentCell.Color = startingCell.Color;
 					currentGrid.DrawnCells.Add(currentCell);
+					currentCell.IsConnected = true;
+					previousCell = currentCell;
+					label6.Text = currentGrid.Validate().ToString();
 					label5.Text = currentCell.Color.ToString();
+					currentGrid.ShowValidation(leftCellsToColorListBox);
 					//currentGrid.Draw(currentCell);
 					currentGrid.Draw();
 					label3.Text = $"{idx++}";
 				}
-				
+
 			}
 		}
 
@@ -56,6 +72,8 @@ namespace flow
 			{
 				timer.Enabled = true;
 				startingCell = currentGrid.GetCellUnderMouse(e.X, e.Y);
+				startingCell.IsConnected = true;
+				previousCell = startingCell;
 				label4.Text = currentGrid.GetCellUnderMouse(e.X, e.Y).Color.ToString();
 				//if (currentGrid.GetCellUnderMouse(e.X, e.Y).color != Color.White)
 				
@@ -107,9 +125,9 @@ namespace flow
 			label1.Text = $@"{e.X} {e.Y}";
 			//label2.Text = 
 			if (int.TryParse(textBox1.Text, out int lvl))
-				label2.Text = Levels.Levels6[lvl - 1].GetColAndRowUnderMouse(e.X, e.Y).ToString();
+				label2.Text = Levels.Levels6[lvl - 1].GetRowAndColUnderMouse(e.X, e.Y).ToString();
 			else
-				label2.Text = Levels.Levels6[0].GetColAndRowUnderMouse(e.X, e.Y).ToString();
+				label2.Text = Levels.Levels6[0].GetRowAndColUnderMouse(e.X, e.Y).ToString();
 		}
 
 		
