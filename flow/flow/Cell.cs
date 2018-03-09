@@ -3,10 +3,14 @@ using System.Drawing;
 
 namespace flow
 {
+    public enum Triangle
+    {
+        North, South, East, West
+    }
     class Cell
     {
-		// x -> col
-		// y -> row
+        // x -> col
+        // y -> row
 
 		public static Dictionary<char, Color> Colors = new Dictionary<char, Color>
 		{
@@ -35,6 +39,9 @@ namespace flow
 		public int MaxWidthHeight { get; set; }
 		public bool IsConnected { get; set; }
 
+        public LinkedList<Cell> Path { get; set; }
+
+
 		public Cell(int row, int col, int countInRowCol, int maxWidthHeight, char colorValue = 'w', bool isInitial = false)
 		{
 			Row = row;
@@ -47,6 +54,7 @@ namespace flow
 			X = Col * MaxWidthHeight / CountInRowCol;
 			Y = Row * MaxWidthHeight / CountInRowCol;
 			Width = Height = MaxWidthHeight / CountInRowCol;
+            Path = new LinkedList<Cell>();
 		}
 
 		public void Draw(Graphics formGraphics)
@@ -59,5 +67,44 @@ namespace flow
 		{
 			return Color + " " + IsInitial;
 		}
+        public static void ClearPath(Cell cell)
+        {
+            if (cell.IsInitial)
+            {
+                foreach (Cell c in cell.Path)
+                {
+                    if (!c.IsInitial)
+                    {
+                        c.IsConnected = false;
+                        c.Color = Colors['w'];
+                        c.Draw(Form2.FormGraphics);
+                    }
+                }
+            }
+        }
+        public Triangle GetTriangle(int x, int y)
+        {
+            if (x > y && (x + y) < Width)
+            {
+                return Triangle.North;
+            }
+            else if (x < y && (x + y) > Width)
+            {
+                return Triangle.South;
+            }
+            else if (x > y && (x + y) > Width)
+            {
+                return Triangle.East;
+            }
+            else // if (x < y && (x + y) < Width)
+            {
+                return Triangle.West;
+            }
+        }
+
+        public static Triangle GetTriangleForCell(Cell cell, int x, int y)
+        {
+            return cell.GetTriangle(x, y);
+        }
 	}
 }

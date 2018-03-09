@@ -47,6 +47,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cell.cs" />
+    <Compile Include="Coloring.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Coloring.Designer.cs">
+      <DependentUpon>Coloring.cs</DependentUpon>
+    </Compile>
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -61,8 +67,12 @@
     </Compile>
     <Compile Include="Grid.cs" />
     <Compile Include="Levels.cs" />
+    <Compile Include="Pipes.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Coloring.resx">
+      <DependentUpon>Coloring.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
