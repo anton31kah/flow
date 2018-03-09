@@ -212,7 +212,6 @@
 			this.Controls.Add(this.button1);
 			this.Name = "Form2";
 			this.Text = "Form2";
-			this.Load += new System.EventHandler(this.Form2_Load);
 			this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form2_MouseDown);
 			this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form2_MouseMove);
 			this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form2_MouseUp);

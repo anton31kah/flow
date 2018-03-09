@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 using Timer = System.Timers.Timer;
@@ -21,6 +16,7 @@ namespace flow
 		private Cell startingCell;
 		private Cell previousCell;
 		private Cell currentCell;
+        public static Graphics FormGraphics;
 
 		public Form2()
         {
@@ -40,7 +36,8 @@ namespace flow
 			label12.Text = $"{currentCell?.Row} {currentCell?.Col}";
 			if (MouseButtons == MouseButtons.Left)
 			{
-				currentCell = currentGrid.GetCellUnderMouse(currentPoint.X, currentPoint.Y);
+                currentCell = currentGrid.GetCellUnderMouse(currentPoint.X, currentPoint.Y);
+                Color previousColor = currentCell.Color;
 				//label5.Text = currentGrid.Cells[0][4].color.ToString();
 				//label5.Text = currentGrid.GetCellUnderMouse(currentPoint.X, currentPoint.Y).color.ToString();
 
@@ -48,19 +45,35 @@ namespace flow
 								(currentGrid.AreAdjacentOrSame(currentCell, startingCell) || currentGrid.AreAdjacent(currentCell, previousCell)))
 					.ToString();
 
+                if (currentCell.Color != startingCell.Color && currentCell.IsInitial)
+                {
+                    Form2_MouseUp(null, null);
+                }
+                if (currentCell.Color != startingCell.Color && currentCell.Color != Cell.Colors['w'])
+                {
+                    Cell.ClearPath(currentGrid.GetInitialCellByColor(previousColor));
+                }
+
 				if (currentCell != startingCell && (!currentCell.IsInitial || previousCell.Color == currentCell.Color) &&
 					(currentGrid.AreAdjacentOrSame(currentCell, startingCell) || currentGrid.AreAdjacent(currentCell, previousCell)))
 				{
+                    //if (currentCell.Color == previousCell.Color && (!previousCell.IsInitial && !currentCell.IsInitial))
+                    //{
+                    //    previousCell.Color = Cell.Colors['w'];
+                    //    previousCell.IsConnected = false;
+                    //    previousCell.Draw(Form2.FormGraphics);
+                    //    startingCell.Path.Remove(previousCell);
+                    //}
 					currentCell.Color = startingCell.Color;
 					currentGrid.DrawnCells.Add(currentCell);
 					currentCell.IsConnected = true;
-					previousCell = currentCell;
+                    startingCell.Path.AddLast(currentCell);
+                    previousCell = currentCell;
 					label6.Text = currentGrid.Validate().ToString();
 					label5.Text = currentCell.Color.ToString();
 					currentGrid.ShowValidation(leftCellsToColorListBox);
-					//currentGrid.Draw(currentCell);
-					currentGrid.Draw();
-					label3.Text = $"{idx++}";
+                    currentCell.Draw(Form2.FormGraphics);
+                    label3.Text = $"{idx++}";
 				}
 
 			}
@@ -73,6 +86,15 @@ namespace flow
 				timer.Enabled = true;
 				startingCell = currentGrid.GetCellUnderMouse(e.X, e.Y);
 				startingCell.IsConnected = true;
+                if (startingCell.IsInitial)
+                {
+                    Cell OtherCell = currentGrid.GetOtherEnd(startingCell);
+                    if (OtherCell.Path.Any())
+                    {
+                        Cell.ClearPath(OtherCell);
+                        OtherCell.Path.Clear();
+                    }
+                }
 				previousCell = startingCell;
 				label4.Text = currentGrid.GetCellUnderMouse(e.X, e.Y).Color.ToString();
 				//if (currentGrid.GetCellUnderMouse(e.X, e.Y).color != Color.White)
@@ -86,15 +108,11 @@ namespace flow
 			label3.Text = "";
 		}
 
-		private void Form2_Load(object sender, EventArgs e)
-		{
-			
-		}
-
         private void button1_Click(object sender, EventArgs e)
         {
             Graphics formGraphics;
             formGraphics = this.CreateGraphics();
+            FormGraphics = formGraphics;
 			//formGraphics.FillRectangle(myBrush, new Rectangle(0, 0, 200, 300));
 			//formGraphics.Dispose();
 			if (int.TryParse(textBox1.Text, out int lvl))

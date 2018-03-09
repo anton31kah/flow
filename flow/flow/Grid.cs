@@ -160,5 +160,15 @@ namespace flow
 				if (!cell.IsConnected)
 					listBox1.Items.Add($"{cell.Row} {cell.Col}");
 		}
+
+        public Cell GetOtherEnd(Cell cell)
+        {
+            return initialCells.Where(c => c.Color == cell.Color && c != cell).First();
+        }
+
+        public Cell GetInitialCellByColor(Color color)
+        {
+            return initialCells.Where(c => c.Color == color).First();
+        }
 	}
 }
