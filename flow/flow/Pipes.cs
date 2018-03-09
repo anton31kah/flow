@@ -1,23 +1,75 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Drawing;
+﻿using System.Drawing;
 
 namespace flow
 {
-    class Pipes
+	internal class Pipes
     {
         public Graphics Graphics { get; set; }
-        public void Up(int x, int y, int width, int height, Color color)
+		private readonly Pen _pen = new Pen(Color.Black, 2);
+
+		public void Border(int x, int y, int width, int height)
+		{
+			Graphics.DrawRectangle(_pen, new Rectangle(x, y, width, height));
+		}
+
+		public void Big(int x, int y, int width, int height, Color color)
+		{
+			Brush brush = new SolidBrush(color);
+			Graphics.FillEllipse(brush, new Rectangle(x + width / 6, y + height / 6, 2 * width / 3, 2 * height / 3));
+			Border(x, y, width, height);
+		}
+
+		public void Small(int x, int y, int width, int height, Color color)
+		{
+			Brush brush = new SolidBrush(color);
+			Graphics.FillEllipse(brush, new Rectangle(x + width / 3, y + height / 3, width / 3, height / 3));
+			Border(x, y, width, height);
+		}
+
+		public void Up(int x, int y, int width, int height, Color color)
         {
-            // WORK HERE
-            Graphics.FillRectangle(new SolidBrush(color), new Rectangle(x + width / 3, y, 100 / 3, 100 / 2));
-            Graphics.FillEllipse(new SolidBrush(color), new Rectangle(100 / 3, 300 + 100 / 3, 100 / 3, 100 / 3));
-            Graphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(0, 300, 100, 100));
+			Small(x, y, width, height, color);
+            Graphics.FillRectangle(new SolidBrush(color), new Rectangle(x + width / 3, y, width / 3, height / 2));
+            Border(x, y, width, height);
         }
-        //public void /*Draw*/
-        //public 
-    }
+
+		public void Down(int x, int y, int width, int height, Color color)
+		{
+			Small(x, y, width, height, color);
+			Graphics.FillRectangle(new SolidBrush(color), new Rectangle(x + width / 3, y + height / 2, width / 3, height / 2));
+			Border(x, y, width, height);
+		}
+		public void Left(int x, int y, int width, int height, Color color)
+		{
+			Small(x, y, width, height, color);
+			Graphics.FillRectangle(new SolidBrush(color), new Rectangle(x, y + height / 3, width / 2, height / 3));
+			Border(x, y, width, height);
+		}
+		public void Right(int x, int y, int width, int height, Color color)
+		{
+			Small(x, y, width, height, color);
+			Graphics.FillRectangle(new SolidBrush(color), new Rectangle(x + width / 2, y + height / 3, width / 2, height / 3));
+			Border(x, y, width, height);
+		}
+		public void UpLeft(int x, int y, int width, int height, Color color)
+		{
+			Up(x, y, width, height, color);
+			Left(x, y, width, height, color);
+		}
+		public void UpRight(int x, int y, int width, int height, Color color)
+		{
+			Up(x, y, width, height, color);
+			Right(x, y, width, height, color);
+		}
+		public void DownLeft(int x, int y, int width, int height, Color color)
+		{
+			Down(x, y, width, height, color);
+			Left(x, y, width, height, color);
+		}
+		public void DownRight(int x, int y, int width, int height, Color color)
+		{
+			Down(x, y, width, height, color);
+			Right(x, y, width, height, color);
+		}
+	}
 }
