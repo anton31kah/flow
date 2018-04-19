@@ -26,6 +26,12 @@ namespace flow
 			Border(x, y, width, height);
 		}
 
+		public void Medium(int x, int y, int width, int height, Color color)
+		{
+			Brush brush = new SolidBrush(color);
+			Graphics.FillEllipse(brush, new Rectangle(x + width / 4, y + height / 4, width / 2, height / 2));
+			Border(x, y, width, height);
+		}
 		public void Up(int x, int y, int width, int height, Color color)
         {
 			Small(x, y, width, height, color);
@@ -69,6 +75,18 @@ namespace flow
 		public void DownRight(int x, int y, int width, int height, Color color)
 		{
 			Down(x, y, width, height, color);
+			Right(x, y, width, height, color);
+		}
+
+		public void UpDown(int x, int y, int width, int height, Color color)
+		{
+			Up(x, y, width, height, color);
+			Down(x, y, width, height, color);
+		}
+
+		public void LeftRight(int x, int y, int width, int height, Color color)
+		{
+			Left(x, y, width, height, color);
 			Right(x, y, width, height, color);
 		}
 	}
