@@ -25,6 +25,7 @@ namespace flow
 		private int Height { get; set; }
 		private int Size { get; set; }
 		public Graphics formGraphics { get; set; }
+		public static Grid Empty { get; } = new Grid(5, 500, 500);
 
 		public Grid(int n, int width, int height, List<Cell> initialCells = null)
 		{
@@ -43,7 +44,7 @@ namespace flow
 					Cells[i][j] = new Cell(i, j, n, width);
 				}
 			}
-
+			if (this.initialCells == null) return;
 			foreach (Cell initialCell in initialCells)
 			{
 				Cells[initialCell.Row][initialCell.Col] = initialCell;
