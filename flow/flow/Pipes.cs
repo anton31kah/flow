@@ -2,10 +2,10 @@
 
 namespace flow
 {
-	internal class Pipes
+	public class Pipes
     {
         public Graphics Graphics { get; set; }
-		private readonly Pen _pen = new Pen(Color.Black, 2);
+		private readonly Pen _pen = new Pen(Color.YellowGreen, 2);
 
 		public void Border(int x, int y, int width, int height)
 		{
@@ -17,6 +17,7 @@ namespace flow
 			Brush brush = new SolidBrush(color);
 			Graphics.FillEllipse(brush, new Rectangle(x + width / 6, y + height / 6, 2 * width / 3, 2 * height / 3));
 			Border(x, y, width, height);
+            brush.Dispose();
 		}
 
 		public void Small(int x, int y, int width, int height, Color color)
@@ -24,14 +25,16 @@ namespace flow
 			Brush brush = new SolidBrush(color);
 			Graphics.FillEllipse(brush, new Rectangle(x + width / 3, y + height / 3, width / 3, height / 3));
 			Border(x, y, width, height);
-		}
+            brush.Dispose();
+        }
 
 		public void Medium(int x, int y, int width, int height, Color color)
 		{
 			Brush brush = new SolidBrush(color);
 			Graphics.FillEllipse(brush, new Rectangle(x + width / 4, y + height / 4, width / 2, height / 2));
 			Border(x, y, width, height);
-		}
+            brush.Dispose();
+        }
 		public void Up(int x, int y, int width, int height, Color color)
         {
 			Small(x, y, width, height, color);
@@ -44,7 +47,7 @@ namespace flow
 			Small(x, y, width, height, color);
 			Graphics.FillRectangle(new SolidBrush(color), new Rectangle(x + width / 3, y + height / 2, width / 3, height / 2));
 			Border(x, y, width, height);
-		}
+        }
 		public void Left(int x, int y, int width, int height, Color color)
 		{
 			Small(x, y, width, height, color);

@@ -21,10 +21,11 @@ namespace flow
 		public Form2()
         {
             InitializeComponent();
-			timer = new Timer();
-			timer.Interval = 33.3333333333333D; // 30 fps
-			timer.Elapsed += mouse_down;
-		}
+            this.BackColor = Color.White;
+            timer = new Timer();
+            timer.Interval = 33.3333333333333D; // 30 fps
+            timer.Elapsed += mouse_down;
+        }
 
 		private void mouse_down(object sender, ElapsedEventArgs e)
 		{
@@ -41,23 +42,23 @@ namespace flow
 				//label5.Text = currentGrid.Cells[0][4].color.ToString();
 				//label5.Text = currentGrid.GetCellUnderMouse(currentPoint.X, currentPoint.Y).color.ToString();
 
-				label13.Text = (currentCell != startingCell && (!currentCell.IsInitial || previousCell.Color == currentCell.Color) &&
+				label13.Text = (currentCell != startingCell && (!(currentCell is InitialCell) || previousCell.Color == currentCell.Color) &&
 								(currentGrid.AreAdjacentOrSame(currentCell, startingCell) || currentGrid.AreAdjacent(currentCell, previousCell)))
 					.ToString();
 
-                if (currentCell.Color != startingCell.Color && currentCell.IsInitial)
+                if (currentCell.Color != startingCell.Color && currentCell is InitialCell)
                 {
                     Form2_MouseUp(null, null);
                 }
                 if (currentCell.Color != startingCell.Color && currentCell.Color != Cell.Colors['w'])
                 {
-                    Cell.ClearPath(currentGrid.GetInitialCellByColor(previousColor));
+                    //Cell.ClearPath(currentGrid.GetInitialCellByColor(previousColor));
                 }
 
-				if (currentCell != startingCell && (!currentCell.IsInitial || previousCell.Color == currentCell.Color) &&
+				if (currentCell != startingCell && (!(currentCell is InitialCell) || previousCell.Color == currentCell.Color) &&
 					(currentGrid.AreAdjacentOrSame(currentCell, startingCell) || currentGrid.AreAdjacent(currentCell, previousCell)))
 				{
-                    //if (currentCell.Color == previousCell.Color && (!previousCell.IsInitial && !currentCell.IsInitial))
+                    //if (currentCell.Color == previousCell.Color && (!previousCell is InitialCell && !currentCell is InitialCell))
                     //{
                     //    previousCell.Color = Cell.Colors['w'];
                     //    previousCell.IsConnected = false;
@@ -75,23 +76,23 @@ namespace flow
                     currentCell.Draw(Form2.FormGraphics);
                     label3.Text = $"{idx++}";
 				}
-
+                
 			}
 		}
 
 		private void Form2_MouseDown(object sender, MouseEventArgs e)
 		{
-			if (e.X < 500)
+			if (timer != null && e.X < 500)
 			{
 				timer.Enabled = true;
 				startingCell = currentGrid.GetCellUnderMouse(e.X, e.Y);
 				startingCell.IsConnected = true;
-                if (startingCell.IsInitial)
+                if (startingCell is InitialCell)
                 {
                     Cell OtherCell = currentGrid.GetOtherEnd(startingCell);
                     if (OtherCell.Path.Any())
                     {
-                        Cell.ClearPath(OtherCell);
+                        //Cell.ClearPath(OtherCell);
                         OtherCell.Path.Clear();
                     }
                 }
@@ -104,7 +105,13 @@ namespace flow
 
 		private void Form2_MouseUp(object sender, MouseEventArgs e)
 		{
-			timer.Enabled = false;
+            if (timer != null && currentGrid.Validate())
+            {
+                timer.Stop();
+                timer = null;
+                MessageBox.Show("Level Finished");
+            }
+            //timer.Enabled = false;
 			label3.Text = "";
 		}
 
@@ -117,10 +124,10 @@ namespace flow
 			//formGraphics.Dispose();
 			if (int.TryParse(textBox1.Text, out int lvl))
 			{
-				
-				//Levels.levels5[lvl - 1].formGraphics = formGraphics;
-				//Levels.levels5[lvl - 1].Draw();
-			}
+
+                Levels.Levels5[lvl - 1].formGraphics = formGraphics;
+                Levels.Levels5[lvl - 1].Draw();
+            }
 			else
 			{
 				currentGrid = Levels.Levels6[0];
@@ -148,6 +155,9 @@ namespace flow
 				label2.Text = Levels.Levels6[0].GetRowAndColUnderMouse(e.X, e.Y).ToString();
 		}
 
-		
-	}
+        private void Form2_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+    }
 }
