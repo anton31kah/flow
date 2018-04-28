@@ -27,13 +27,13 @@ namespace flow
              * 
              */ 
             // big
-			Pipes pipes = new Pipes();
+			//Pipes pipes = new Pipes();
 
-			pipes.Graphics = graphics;
-			pipes.Big(0, 0, 100, 100, Color.Blue);
-			pipes.Down(0, 0, 100, 100, Color.Blue);
-			pipes.Up(0, 100, 100, 100, Color.Blue);
-			pipes.Medium(0, 100, 100, 100, Color.Blue);
+			Pipes.Graphics = graphics;
+			Pipes.Big(0, 0, 100, 100, Color.Blue);
+			Pipes.Down(0, 0, 100, 100, Color.Blue);
+			Pipes.Up(0, 100, 100, 100, Color.Blue);
+			Pipes.Medium(0, 100, 100, 100, Color.Blue);
 			//         graphics.FillEllipse(new SolidBrush(Color.Red), new Rectangle(100 / 6, 100 / 6, 2 * 100 / 3, 2 * 100 / 3));
 			//         graphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(0, 0, 100, 100));
 

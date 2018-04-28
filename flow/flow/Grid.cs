@@ -47,10 +47,13 @@ namespace flow
                     if (this.initialCells != null && initialCells.Any(c => c.Row == i && c.Col == j))
                     {
                         var cell = initialCells.First(c => c.Row == i && c.Col == j);
-                        Cells[i][j] = new InitialCell(i, j, n, width, cell.ColorValue);
-                        var last = initialCells.Last(c => c.Color == cell.Color);
-                        Paths[cell.Color] = new Path(cell, last);
-                    }
+						Cells[i][j] = new InitialCell(i, j, n, width, cell.ColorValue);
+						if (!Paths.ContainsKey(cell.Color))
+						{
+							var last = initialCells.Last(c => c.Color == cell.Color);
+							Paths[cell.Color] = new Path(cell, last);
+						}
+					}
                     else Cells[i][j] = new NormalCell(i, j, n, width, 'd');
                 }
             }
@@ -64,10 +67,20 @@ namespace flow
         public void Reset()
         {
             for (int i = 0; i < Size; i++)
-                for (int j = 0; j < Size; j++)
-                    if (Cells[i][j] is NormalCell)
-                        Cells[i][j].Color = Color.Black;
-        }
+			{
+				for (int j = 0; j < Size; j++)
+				{
+					if (Cells[i][j] is NormalCell)
+					{
+						if (Cells[i][j].Color != Color.Black)
+						{
+							Paths[Cells[i][j].Color].PathList.Remove(Cells[i][j]);
+							Cells[i][j].Color = Color.Black;
+						}
+					}
+				}
+			}
+		}
 
         /*
         public void Draw(Cell specialCell = null)

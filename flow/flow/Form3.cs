@@ -55,12 +55,21 @@ namespace flow
             if (MouseIsDown)
             {
                 var Cell = Grid.GetCellUnderMouse(e.X, e.Y);
-                if (!(Cell is InitialCell))
+                if (!(Cell is InitialCell) && !Grid.Paths[FirstColor].PathList.Contains(Cell))
                 {
                     Cell.Color = FirstColor;
-                    LastVisitedCell = Grid.Paths[FirstColor].PathList.AddAfter(LastVisitedCell, Cell);
+
+                    //LastVisitedCell = Grid.Paths[FirstColor].PathList.AddAfter(LastVisitedCell, Cell);
+					LastVisitedCell = Grid.Paths[FirstColor].AddAfter(LastVisitedCell, Cell);
+					label2.Text = Grid.Paths[FirstColor].ToString();
                     Invalidate();
                 }
+
+				if (Cell is InitialCell && Grid.Paths[FirstColor].PathList.Count > 2 && (Grid.Paths[FirstColor].PathList.Last.Value.Equals(Cell) || Grid.Paths[FirstColor].PathList.First.Value.Equals(Cell)))
+				{
+					label2.Text = "OVER";
+					Invalidate();
+				}
             }
             //if (GridIsSet && e.X < 500)
             //{
@@ -72,7 +81,8 @@ namespace flow
         {
             if (!int.TryParse(textBox1.Text, out int level))
             {
-                Grid = Levels.Levels6[0];
+				GridIsSet = true;
+				Grid = Levels.Levels6[0];
             }
             else
             {
@@ -81,7 +91,8 @@ namespace flow
                 Grid = Levels.Levels6[level - 1];
                 if (PreviousLevel != -1 && level != PreviousLevel)
                 {
-                    Levels.Levels6[PreviousLevel - 1].Reset();
+					//MessageBox.Show($"previous {PreviousLevel}, level {level}");
+                    Levels.Levels6[PreviousLevel].Reset();
                 }
             }
             PreviousLevel = level;

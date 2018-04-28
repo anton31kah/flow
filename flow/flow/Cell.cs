@@ -39,7 +39,7 @@ namespace flow
 		public int CountInRowCol { get; set; }
 		public int MaxWidthHeight { get; set; }
 		public bool IsConnected { get; set; }
-        public Pipes Pipe { get; set; } = new Pipes();
+        //public Pipes Pipe { get; set; } = new Pipes();
 
         public LinkedList<Cell> Path { get; set; }
 
@@ -64,7 +64,7 @@ namespace flow
 
 		public override string ToString()
 		{
-			return Color + " " + (this is InitialCell);
+			return Color + " " + (this is InitialCell) + $" {Row}, {Col}";
 		}
         //public static void ClearPath(Cell cell)
         //{
@@ -105,5 +105,20 @@ namespace flow
         {
             return cell.GetTriangle(x, y);
         }
+
+		public override bool Equals(object obj)
+		{
+			return obj is Cell cell &&
+				   Row == cell.Row &&
+				   Col == cell.Col;
+		}
+
+		public override int GetHashCode()
+		{
+			var hashCode = 1084646500;
+			hashCode = hashCode * -1521134295 + Row.GetHashCode();
+			hashCode = hashCode * -1521134295 + Col.GetHashCode();
+			return hashCode;
+		}
 	}
 }
