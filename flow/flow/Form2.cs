@@ -50,7 +50,7 @@ namespace flow
                 {
                     Form2_MouseUp(null, null);
                 }
-                if (currentCell.Color != startingCell.Color && currentCell.Color != Cell.Colors['w'])
+                if (currentCell.Color != startingCell.Color && currentCell.Color != Color.White)
                 {
                     //Cell.ClearPath(currentGrid.GetInitialCellByColor(previousColor));
                 }

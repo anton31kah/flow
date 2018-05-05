@@ -12,25 +12,10 @@ namespace flow
         // x -> col
         // y -> row
 
-		public static Dictionary<char, Color> Colors = new Dictionary<char, Color>
-		{
-			{'d', Color.Black},
-			{'r', Color.Red },
-			{'g', Color.Green },
-			{'b', Color.Blue },
-			{'y', Color.Yellow },
-			{'o', Color.Orange },
-			{'a', Color.Aqua },
-			{'c', Color.Cyan },
-			{'m', Color.Magenta},
-			{'p', Color.Purple },
-			{'n', Color.Brown }
-		};
-		//public bool IsInitial { get; set; }
+		
         public Color Color { get; set; }
-        public char ColorValue { get; set; }
-        //public int X { get; set; }
-        //public int Y { get; set; }
+
+        public int NumberOfPipes { get; set; }
         public Point Point { get; set; }
         public int Row { get; set; }
 		public int Col { get; set; }
@@ -39,19 +24,18 @@ namespace flow
 		public int CountInRowCol { get; set; }
 		public int MaxWidthHeight { get; set; }
 		public bool IsConnected { get; set; }
-        //public Pipes Pipe { get; set; } = new Pipes();
+        public Queue<PipeDirection> PipeDirection { get; set; }
 
         public LinkedList<Cell> Path { get; set; }
 
 
-        protected Cell(int row, int col, int countInRowCol, int maxWidthHeight, char colorValue = 'd')
+        protected Cell(int row, int col, int countInRowCol, int maxWidthHeight, Color color)
         {
             Row = row;
             Col = col;
             CountInRowCol = countInRowCol;
             MaxWidthHeight = maxWidthHeight;
-            ColorValue = colorValue;
-            Color = Colors[ColorValue];
+            Color = color;
             Point = new Point { X = Col * MaxWidthHeight / CountInRowCol, Y = Row * MaxWidthHeight / CountInRowCol };
             Width = Height = MaxWidthHeight / CountInRowCol;
             Path = new LinkedList<Cell>();
@@ -66,21 +50,6 @@ namespace flow
 		{
 			return Color + " " + (this is InitialCell) + $" {Row}, {Col}";
 		}
-        //public static void ClearPath(Cell cell)
-        //{
-        //    if (cell is InitialCell)
-        //    {
-        //        foreach (Cell c in cell.Path)
-        //        {
-        //            if (!c.IsInitial)
-        //            {
-        //                c.IsConnected = false;
-        //                c.Color = Colors['w'];
-        //                c.Draw(Form2.FormGraphics);
-        //            }
-        //        }
-        //    }
-        //}
         public Triangle GetTriangle(int x, int y)
         {
             if (x > y && (x + y) < Width)
@@ -120,5 +89,9 @@ namespace flow
 			hashCode = hashCode * -1521134295 + Col.GetHashCode();
 			return hashCode;
 		}
-	}
+
+        public virtual void AddPipe(PipeDirection pipeDirection)
+        {
+        }
+    }
 }

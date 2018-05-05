@@ -47,21 +47,16 @@ namespace flow
                     if (this.initialCells != null && initialCells.Any(c => c.Row == i && c.Col == j))
                     {
                         var cell = initialCells.First(c => c.Row == i && c.Col == j);
-						Cells[i][j] = new InitialCell(i, j, n, width, cell.ColorValue);
+						Cells[i][j] = new InitialCell(i, j, n, width, cell.Color);
 						if (!Paths.ContainsKey(cell.Color))
 						{
 							var last = initialCells.Last(c => c.Color == cell.Color);
 							Paths[cell.Color] = new Path(cell, last);
 						}
 					}
-                    else Cells[i][j] = new NormalCell(i, j, n, width, 'd');
+                    else Cells[i][j] = new NormalCell(i, j, n, width, Color.Black);
                 }
             }
-            //if (this.initialCells == null) return;
-            //foreach (Cell initialCell in initialCells)
-            //{
-            //	Cells[initialCell.Row][initialCell.Col] = initialCell;
-            //}
         }
 
         public void Reset()
@@ -74,51 +69,15 @@ namespace flow
 					{
 						if (Cells[i][j].Color != Color.Black)
 						{
+                            Cells[i][j].PipeDirection.Clear();
 							Paths[Cells[i][j].Color].PathList.Remove(Cells[i][j]);
-							Cells[i][j].Color = Color.Black;
+                            Cells[i][j].Color = Color.Black;
 						}
 					}
 				}
 			}
 		}
-
-        /*
-        public void Draw(Cell specialCell = null)
-        {
-            SolidBrush brush = new SolidBrush(Cell.Colors['w']);
-            for (int i = 0; i < Size; i++)
-            {
-                for (int j = 0; j < Size; j++)
-                {
-                    var cell = Cells[i][j];
-                    formGraphics.FillRectangle(new SolidBrush(Cell.Colors['w']), new Rectangle(cell.Y, cell.X, cell.Width, cell.Height));
-					formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(cell.Y, cell.X, cell.Width, cell.Height));
-				}
-            }
-			//if (specialCell != null)
-			//{
-			//	formGraphics.FillRectangle(new SolidBrush(specialCell.color), new Rectangle(specialCell.y, specialCell.x, specialCell.width, specialCell.height));
-			//	formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(specialCell.y, specialCell.x, specialCell.width, specialCell.height));
-			//}
-			foreach (Cell cell in initialCells)
-            {
-                brush.Color = cell.Color;
-				Cells[cell.Row][cell.Col] = cell;
-                formGraphics.FillRectangle(brush, new Rectangle(cell.Y, cell.X, cell.Width, cell.Height));
-				formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(cell.Y, cell.X, cell.Width, cell.Height));
-            }
-
-			foreach (Cell cell in DrawnCells)
-			{
-				brush.Color = cell.Color;
-				Cells[cell.Row][cell.Col] = cell;
-				formGraphics.FillRectangle(brush, new Rectangle(cell.Y, cell.X, cell.Width, cell.Height));
-				formGraphics.DrawRectangle(new Pen(Color.Black, 2), new Rectangle(cell.Y, cell.X, cell.Width, cell.Height));
-			}
-            //formGraphics.Dispose();
-			
-	}
-	*/
+        
         public void Draw()
         {
             foreach (Cell[] cells in Cells)
@@ -164,7 +123,7 @@ namespace flow
             // NEW UPDATE
             // nema potreba veke od ovoj metod zosto so previousCell.Color == currentCell.Color vo ifot veke 
             // go resava ova
-            if (Cells.All(cells => cells.All(cell => cell.Color != Cell.Colors['w'])))
+            if (Cells.All(cells => cells.All(cell => cell.Color != Color.White)))
             {
                 foreach (Cell initialCell in initialCells)
                     initialCell.IsConnected = true;
@@ -176,7 +135,8 @@ namespace flow
 
         public bool AreAdjacent(Cell one, Cell two)
         {
-            return Math.Abs(one.Col - two.Col) == 1 || Math.Abs(one.Row - two.Row) == 1;
+            return Math.Abs(one.Col - two.Col) + Math.Abs(one.Row - two.Row) <= 1;
+            //return Math.Abs(one.Col - two.Col) == 1 || Math.Abs(one.Row - two.Row) == 1;
         }
 
         public bool AreAdjacentOrSame(Cell one, Cell two)

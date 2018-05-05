@@ -1,4 +1,5 @@
 ﻿using System.Drawing;
+using System.Windows.Forms;
 
 namespace flow
 {
@@ -29,9 +30,8 @@ namespace flow
 
 		public static void Big(int x, int y, int width, int height, Color color)
 		{
-			Brush brush = new SolidBrush(color);
 			// Graphics.FillRectangle(_blackBrush, new Rectangle(x, y, width, height));
-			Graphics.FillEllipse(brush, new Rectangle(x + width / 6, y + height / 6, 2 * width / 3, 2 * height / 3));
+			Graphics.FillEllipse(new SolidBrush(color), new Rectangle(x + width / 6, y + height / 6, 2 * width / 3, 2 * height / 3));
 			Border(x, y, width, height);
 			//brush.Dispose();
 		}
@@ -67,8 +67,11 @@ namespace flow
 			// Graphics.FillRectangle(_blackBrush, new Rectangle(x, y, width, height));
 			Graphics.FillRectangle(new SolidBrush(color), new Rectangle(x + width / 3, y + height / 2, width / 3, height / 2));
 			Border(x, y, width, height);
-		}
-		public static void Left(int x, int y, int width, int height, Color color)
+            //MessageBox.Show($"Down {x} {y}");
+        }
+        
+
+        public static void Left(int x, int y, int width, int height, Color color)
 		{
 			Small(x, y, width, height, color);
 			// Graphics.FillRectangle(_blackBrush, new Rectangle(x, y, width, height));
