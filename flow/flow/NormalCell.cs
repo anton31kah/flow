@@ -19,6 +19,7 @@ namespace flow
         public override void Draw(Graphics formGraphics)
 		{
 			Pipes.Graphics = formGraphics;
+			//Pipes.Blank(Point.X, Point.Y, Width, Height);
             Pipes.Border(Point.X, Point.Y, Width, Height);
 			foreach (PipeDirection pipeDirection in PipeDirection)
 			{

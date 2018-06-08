@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -16,10 +17,11 @@ namespace flow
         public bool MouseIsDown { get; set; }
         public Color FirstColor { get; set; }
         public bool GridIsSet { get; set; }
-        public int PreviousLevel { get; set; } = -1;
+        public int PreviousLevel { get; set; }
         public LinkedListNode<Cell> LastVisitedCell { get; set; }
 	    public Cell PrevCell { get; set; }
 	    public Graphics GraphicsTest { get; set; }
+		public int UpDownStart { get; set; } // 1 up, -1 down
 
         public Form3()
 		{
@@ -46,7 +48,114 @@ namespace flow
             FirstColor = Cell.Color;
             LastVisitedCell = Grid.Paths[FirstColor].LastAddedCell;
             PrevCell = Cell;
-        }
+
+			if (Cell is InitialCell && Grid.Paths[FirstColor].PathList.Count > 2)
+			{
+				var node = Grid.Paths[FirstColor].PathList.First;
+				while (node != null)
+				{
+					var next = node.Next;
+					if (node.Value is InitialCell)
+					{
+						foreach (Cell[] row in Grid.Cells)
+						{
+							foreach (Cell cell in row)
+							{
+								if (Equals(cell, node.Value))
+								{
+									node.Value.PipeDirection.Clear();
+									node.Value.IsConnected = false;
+									node.Value.NumberOfPipes = 0;
+									goto Outside;
+								}
+							}
+						}
+					}
+					if (node.Value is NormalCell)
+					{
+						Grid.Paths[FirstColor].PathList.Remove(node);
+						foreach (Cell[] row in Grid.Cells)
+						{
+							foreach (Cell cell in row)
+							{
+								if (Equals(cell, node.Value))
+								{
+									node.Value.PipeDirection.Clear();
+									node.Value.Color = Color.Black;
+									node.Value.IsConnected = false;
+									node.Value.NumberOfPipes = 0;
+									goto Outside;
+								}
+							}
+						}
+					}
+					Outside:
+
+					node = next;
+					Invalidate();
+				}
+			}
+			else if (Grid.Paths[FirstColor].PathList.Count > 2) // started
+			{
+				if (UpDownStart == 1) // clear down
+				{
+					var node = Grid.Paths[FirstColor].PathList.Find(Cell)?.Next;
+					while (node?.Value is NormalCell)
+					{
+						var next = node.Next;
+						Grid.Paths[FirstColor].PathList.Remove(node);
+						foreach (Cell[] row in Grid.Cells)
+						{
+							foreach (Cell cell in row)
+							{
+								if (Equals(cell, node.Value))
+								{
+									node.Value.PipeDirection.Clear();
+									node.Value.Color = Color.Black;
+									node.Value.IsConnected = false;
+									node.Value.NumberOfPipes = 0;
+									goto Outside;
+								}
+							}
+						}
+						Outside:
+						node = next;
+					}
+					//Invalidate();
+				}
+				else // clear up
+				{
+					var node = Grid.Paths[FirstColor].PathList.Find(Cell)?.Previous;
+					while (node?.Value is NormalCell)
+					{
+						var prev = node.Previous;
+						Grid.Paths[FirstColor].PathList.Remove(node);
+						foreach (Cell[] row in Grid.Cells)
+						{
+							foreach (Cell cell in row)
+							{
+								if (Equals(cell, node.Value))
+								{
+									node.Value.PipeDirection.Clear();
+									node.Value.Color = Color.Black;
+									node.Value.IsConnected = false;
+									node.Value.NumberOfPipes = 0;
+									goto Outside;
+								}
+							}
+						}
+						Outside:
+						node = prev;
+					}
+				}
+			}
+
+
+			if (Equals(Cell, Grid.Paths[FirstColor].PathList.First.Value))
+				UpDownStart = 1;
+			else if (Equals(Cell, Grid.Paths[FirstColor].PathList.Last.Value))
+				UpDownStart = -1;
+		}
 
         private void Form3_MouseUp(object sender, MouseEventArgs e)
         {
@@ -60,113 +169,138 @@ namespace flow
             {
                 var Cell = Grid.GetCellUnderMouse(e.X, e.Y);
 
-                if (!Grid.AreAdjacent(PrevCell, Cell))
-                    return;
+				Color beforeColor = Cell.Color;
 
-                //if (PrevCell.Color == Cell.Color && Grid.AreAdjacent(PrevCell, Cell) && !(PrevCell is InitialCell))
-                //{
-                //    Grid.Paths[FirstColor].PathList.Remove(Cell);
-                //    Cell.Color = Color.Black;
-                //    Cell.PipeDirection.Clear();
-                //}
+				// clear on touch another
+				if (beforeColor != Color.Black && beforeColor != FirstColor)
+				{
+					var node = Grid.Paths[beforeColor].PathList.First;
+					while (node != null)
+					{
+						var next = node.Next;
+						if (node.Value is InitialCell)
+						{
+							foreach (Cell[] row in Grid.Cells)
+							{
+								foreach (Cell cell in row)
+								{
+									if (Equals(cell, node.Value))
+									{
+										node.Value.PipeDirection.Clear();
+										node.Value.IsConnected = false;
+										node.Value.NumberOfPipes = 0;
+										goto Outside;
+									}
+								}
+							}
+						}
+						if (node.Value is NormalCell)
+						{
+							Grid.Paths[beforeColor].PathList.Remove(node);
+							foreach (Cell[] row in Grid.Cells)
+							{
+								foreach (Cell cell in row)
+								{
+									if (Equals(cell, node.Value))
+									{
+										node.Value.PipeDirection.Clear();
+										node.Value.Color = Color.Black;
+										node.Value.IsConnected = false;
+										node.Value.NumberOfPipes = 0;
+										goto Outside;
+									}
+								}
+							}
+						}
+						Outside:
 
-                if (!(Cell is InitialCell) && (/*Cell.NumberOfPipes != 2 &&*/ !Grid.Paths[FirstColor].PathList.Contains(Cell)))
+						node = next;
+						Invalidate();
+					}
+				}
+
+				if (!Grid.AreAdjacent(PrevCell, Cell))
+					return;
+
+				// TODO ERROR
+				// clear on touch self
+				if (Cell is NormalCell &&
+					beforeColor != Color.Black && 
+					beforeColor == FirstColor && 
+					Grid.Paths[FirstColor].PathList.Contains(Cell) &&
+					!Equals(Grid.Paths[FirstColor].PathList.First.Next?.Value, Cell) &&
+					!Equals(Grid.Paths[FirstColor].PathList.Last.Previous?.Value, Cell))
+				{
+					if (UpDownStart == 1) // clear down
+					{
+						var node = Grid.Paths[FirstColor].PathList.Find(Cell)?.Next;
+						while (node?.Value is NormalCell)
+						{
+							var next = node.Next;
+							Grid.Paths[FirstColor].PathList.Remove(node);
+							foreach (Cell[] row in Grid.Cells)
+							{
+								foreach (Cell cell in row)
+								{
+									if (Equals(cell, node.Value))
+									{
+										node.Value.PipeDirection.Clear();
+										node.Value.Color = Color.Black;
+										node.Value.IsConnected = false;
+										node.Value.NumberOfPipes = 0;
+										goto Outside;
+									}
+								}
+							}
+							Outside:
+							node = next;
+						}
+						//Invalidate();
+					}
+					else // clear up
+					{
+						var node = Grid.Paths[FirstColor].PathList.Find(Cell)?.Previous;
+						while (node?.Value is NormalCell)
+						{
+							var prev = node.Previous;
+							Grid.Paths[FirstColor].PathList.Remove(node);
+							foreach (Cell[] row in Grid.Cells)
+							{
+								foreach (Cell cell in row)
+								{
+									if (Equals(cell, node.Value))
+									{
+										node.Value.PipeDirection.Clear();
+										node.Value.Color = Color.Black;
+										node.Value.IsConnected = false;
+										node.Value.NumberOfPipes = 0;
+										goto Outside;
+									}
+								}
+							}
+							Outside:
+							node = prev;
+						}
+					}
+				}
+
+				
+
+				if (!(Cell is InitialCell) && !Grid.Paths[FirstColor].PathList.Contains(Cell))
                 {
-                    
-                    /*if (PrevCell is InitialCell)
-                    {
-                        Pipes.Graphics = Grid.formGraphics;
-                        if (PrevCell.Row == Cell.Row)
-                        {
-                            if (Cell.Col < PrevCell.Col)
-                            {
-                                Pipes.Right(PrevCell.Row, PrevCell.Col, PrevCell.Width, PrevCell.Height, PrevCell.Color);
-
-                                //Cell.AddPipe(PipeDirection.Right);
-                                //PrevCell.AddPipe(PipeDirection.Left);
-                            }
-                            else if (Cell.Col > PrevCell.Col)
-                            {
-                                Pipes.Left(PrevCell.Row, PrevCell.Col, PrevCell.Width, PrevCell.Height, PrevCell.Color);
-
-                                //Cell.AddPipe(PipeDirection.Left);
-                                //PrevCell.AddPipe(PipeDirection.Right);
-                            }
-                        }
-                        if (PrevCell.Col == Cell.Col)
-                        {
-                            if (PrevCell.Row < Cell.Row)
-                            {
-                                Graphics Graphics = CreateGraphics();
-                                Graphics.FillRectangle(new SolidBrush(PrevCell.Color), new Rectangle(PrevCell.Point.X + PrevCell.Width / 3, PrevCell.Point.Y + PrevCell.Height/ 2, PrevCell.Width/ 3, PrevCell.Height/ 2));
-                                Graphics.Dispose();
-                                //PrevCell.AddPipe(PipeDirection.Down);
-                                //Cell.AddPipe(PipeDirection.Up);
-                            }
-                            else if (PrevCell.Row > Cell.Row)
-                            {
-                                Pipes.Up(PrevCell.Row, PrevCell.Col, PrevCell.Width, PrevCell.Height, PrevCell.Color);
-
-                                //PrevCell.AddPipe(PipeDirection.Up);
-                                //Cell.AddPipe(PipeDirection.Down);
-                            }
-                        }
-
-                        //Grid.formGraphics.DrawString(
-                        //    $"Pipes: {String.Join(",", PrevCell.PipeDirection)}", 
-                        //    SystemFonts.MessageBoxFont, 
-                        //    Brushes.White, 
-                        //    500.0f, 
-                        //    200.0f
-                        //    );
-                    }*/
-
                     Cell.Color = FirstColor;
 
-                    //LastVisitedCell = Grid.Paths[FirstColor].PathList.AddAfter(LastVisitedCell, Cell);
-					LastVisitedCell = Grid.Paths[FirstColor].AddBefore(LastVisitedCell, Cell);
-                    //LastVisitedCell = Grid.Paths[FirstColor].AddAfter(LastVisitedCell, Cell);
-                    Grid.Paths[FirstColor].Update();
+					if (UpDownStart == 1)
+						LastVisitedCell = Grid.Paths[FirstColor].PathList.AddBefore(Grid.Paths[FirstColor].PathList.Last, Cell);
+					else
+						LastVisitedCell = Grid.Paths[FirstColor].PathList.AddAfter(Grid.Paths[FirstColor].PathList.First, Cell);
+
+					Grid.Paths[FirstColor].Update();
                     label2.Text = Grid.Paths[FirstColor].ToString();
                     
                     PrevCell = Cell;
                     Invalidate();
                     Pipes.Graphics = Grid.formGraphics;
-                    if (PrevCell.Row == Cell.Row)
-                    {
-                        if (Cell.Col < PrevCell.Col)
-                        {
-                            Pipes.Right(PrevCell.Row, PrevCell.Col, PrevCell.Width, PrevCell.Height, PrevCell.Color);
-
-                            //Cell.AddPipe(PipeDirection.Right);
-                            //PrevCell.AddPipe(PipeDirection.Left);
-                        }
-                        else if (Cell.Col > PrevCell.Col)
-                        {
-                            Pipes.Left(PrevCell.Row, PrevCell.Col, PrevCell.Width, PrevCell.Height, PrevCell.Color);
-
-                            //Cell.AddPipe(PipeDirection.Left);
-                            //PrevCell.AddPipe(PipeDirection.Right);
-                        }
-                    }
-                    if (PrevCell.Col == Cell.Col)
-                    {
-                        if (PrevCell.Row < Cell.Row)
-                        {
-                            Graphics Graphics = CreateGraphics();
-                            Graphics.FillRectangle(new SolidBrush(PrevCell.Color), new Rectangle(PrevCell.Point.X + PrevCell.Width / 3, PrevCell.Point.Y + PrevCell.Height / 2, PrevCell.Width / 3, PrevCell.Height / 2));
-                            Graphics.Dispose();
-                            //PrevCell.AddPipe(PipeDirection.Down);
-                            //Cell.AddPipe(PipeDirection.Up);
-                        }
-                        else if (PrevCell.Row > Cell.Row)
-                        {
-                            Pipes.Up(PrevCell.Row, PrevCell.Col, PrevCell.Width, PrevCell.Height, PrevCell.Color);
-
-                            //PrevCell.AddPipe(PipeDirection.Up);
-                            //Cell.AddPipe(PipeDirection.Down);
-                        }
-                    }
 
                 }
 
@@ -175,12 +309,7 @@ namespace flow
 					label2.Text = "OVER";
 					Invalidate();
 				}
-                //Invalidate();
-            }
-            //if (GridIsSet && e.X < 500)
-            //{
-            //    label1.Text = (Grid.GetCellUnderMouse(e.X, e.Y) is InitialCell).ToString();
-            //}
+			}
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -188,17 +317,17 @@ namespace flow
             if (!int.TryParse(textBox1.Text, out int level))
             {
 				GridIsSet = true;
-				Grid = Levels.Levels6[0];
+				Grid = Levels.RegularLevels[6][1];
             }
             else
             {
-                
                 GridIsSet = true;
-                Grid = Levels.Levels6[level - 1];
-                if (PreviousLevel != -1 && level != PreviousLevel)
+                Grid = Levels.RegularLevels[6][level];
+                if (PreviousLevel != 0 && level != PreviousLevel)
                 {
 					//MessageBox.Show($"previous {PreviousLevel}, level {level}");
-                    Levels.Levels6[PreviousLevel].Reset();
+					Levels.RegularLevels[6][PreviousLevel].Reset();
+
                 }
             }
             PreviousLevel = level;
@@ -209,7 +338,7 @@ namespace flow
         {
             if (PreviousLevel == 0)
                 PreviousLevel = 1;
-            Levels.Levels6[PreviousLevel - 1].Reset();
+			Levels.RegularLevels[6][PreviousLevel].Reset();
             label2.Text = "";
             Invalidate();
         }

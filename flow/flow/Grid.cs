@@ -47,7 +47,7 @@ namespace flow
                     if (this.initialCells != null && initialCells.Any(c => c.Row == i && c.Col == j))
                     {
                         var cell = initialCells.First(c => c.Row == i && c.Col == j);
-						Cells[i][j] = new InitialCell(i, j, n, width, cell.Color);
+						Cells[i][j] = cell;
 						if (!Paths.ContainsKey(cell.Color))
 						{
 							var last = initialCells.Last(c => c.Color == cell.Color);
@@ -59,42 +59,46 @@ namespace flow
             }
         }
 
-        public void Reset()
-        {
-            for (int i = 0; i < Size; i++)
+		public void Reset()
+		{
+			for (int i = 0; i < Size; i++)
 			{
 				for (int j = 0; j < Size; j++)
 				{
+					Cells[i][j].IsConnected = false;
+					Cells[i][j].NumberOfPipes = 0;
 					if (Cells[i][j] is NormalCell)
 					{
 						if (Cells[i][j].Color != Color.Black)
 						{
-                            Cells[i][j].PipeDirection.Clear();
+							Cells[i][j].PipeDirection.Clear();
 							Paths[Cells[i][j].Color].PathList.Remove(Cells[i][j]);
-                            Cells[i][j].Color = Color.Black;
+							Cells[i][j].Color = Color.Black;
 						}
 					}
+					else
+						Cells[i][j].PipeDirection.Clear();
 				}
 			}
 		}
-        
-        public void Draw()
+
+		public void Draw()
         {
             foreach (Cell[] cells in Cells)
                 foreach (Cell cell in cells)
                     cell.Draw(formGraphics);
         }
 
-        public Cell GetCellUnderMouse(int x, int y)
-        {
-            int cellWidth = Width / Size;
-            int col = x / cellWidth;
-            int row = y / cellWidth;
-            return Cells[row][col];
-        }
+		public Cell GetCellUnderMouse(int x, int y)
+		{
+			int cellWidth = Width / Size;
+			int col = Math.Min(x / cellWidth, Size - 1);
+			int row = Math.Min(y / cellWidth, Size - 1);
+			return Cells[row][col];
+		}
 
 
-        public Point GetRowAndColUnderMouse(int x, int y)
+		public Point GetRowAndColUnderMouse(int x, int y)
         {
             int cellWidth = Width / Size;
             int col = x / cellWidth;

@@ -27,46 +27,81 @@ namespace flow
         //ERROR ============================================================================
         public void Update()
         {
-            foreach (var prev in PathList)
-            {
-                foreach (var curr in PathList)
-                {
-                    if (!AreAdjacent(curr, prev))
-                        continue;
-                    if (prev.Row == curr.Row)
-                    {
-                        if (curr.Col < prev.Col)
-                        {
-                            curr.AddPipe(PipeDirection.Right);
-                            prev.AddPipe(PipeDirection.Left);
-                        }
-                        else if (curr.Col > prev.Col)
-                        {
-                            curr.AddPipe(PipeDirection.Left);
-                            prev.AddPipe(PipeDirection.Right);
-                        }
-                    }
-                    if (prev.Col == curr.Col)
-                    {
-                        if (prev.Row < curr.Row)
-                        {
-                            prev.AddPipe(PipeDirection.Down);
-                            curr.AddPipe(PipeDirection.Up);
-                        }
-                        else if (prev.Row > curr.Row)
-                        {
-                            prev.AddPipe(PipeDirection.Up);
-                            curr.AddPipe(PipeDirection.Down);
-                        }
-                    }
-                }
-            }
+			var current = PathList.First;
+			for (int i = 0, size = PathList.Count; i < size - 1; i++)
+			{
+				var next = current.Next;
+				if (current.Value.Row == next.Value.Row)
+				{
+					if (next.Value.Col < current.Value.Col)
+					{
+						next.Value.AddPipe(PipeDirection.Right);
+						current.Value.AddPipe(PipeDirection.Left);
+					}
+					else if (next.Value.Col > current.Value.Col)
+					{
+						next.Value.AddPipe(PipeDirection.Left);
+						current.Value.AddPipe(PipeDirection.Right);
+					}
+				}
+				if (current.Value.Col == next.Value.Col)
+				{
+					if (current.Value.Row < next.Value.Row)
+					{
+						current.Value.AddPipe(PipeDirection.Down);
+						next.Value.AddPipe(PipeDirection.Up);
+					}
+					else if (current.Value.Row > next.Value.Row)
+					{
+						current.Value.AddPipe(PipeDirection.Up);
+						next.Value.AddPipe(PipeDirection.Down);
+					}
+				}
+
+				current = next;
+				next = next.Next;
+			}
+
+			//foreach (var prev in PathList)
+   //         {
+   //             foreach (var curr in PathList)
+   //             {
+   //                 if (!AreAdjacent(curr, prev))
+   //                     continue;
+   //                 if (prev.Row == curr.Row)
+   //                 {
+   //                     if (curr.Col < prev.Col)
+   //                     {
+   //                         curr.AddPipe(PipeDirection.Right);
+   //                         prev.AddPipe(PipeDirection.Left);
+   //                     }
+   //                     else if (curr.Col > prev.Col)
+   //                     {
+   //                         curr.AddPipe(PipeDirection.Left);
+   //                         prev.AddPipe(PipeDirection.Right);
+   //                     }
+   //                 }
+   //                 if (prev.Col == curr.Col)
+   //                 {
+   //                     if (prev.Row < curr.Row)
+   //                     {
+   //                         prev.AddPipe(PipeDirection.Down);
+   //                         curr.AddPipe(PipeDirection.Up);
+   //                     }
+   //                     else if (prev.Row > curr.Row)
+   //                     {
+   //                         prev.AddPipe(PipeDirection.Up);
+   //                         curr.AddPipe(PipeDirection.Down);
+   //                     }
+   //                 }
+   //             }
+   //         }
         }
 
 		public LinkedListNode<Cell> AddAfter(LinkedListNode<Cell> toAddAfter, Cell cell)
 		{
 			var prevCell = toAddAfter.Value;
-			if (prevCell.Row == cell.Row)
+			if (prevCell.Row == cell.Row && Math.Abs(prevCell.Col - cell.Col) == 1)
 			{
                 if (cell.Col < prevCell.Col)
                 {
@@ -79,7 +114,7 @@ namespace flow
                     prevCell.AddPipe(PipeDirection.Right);
                 }
 			}
-			if (prevCell.Col == cell.Col)
+			if (prevCell.Col == cell.Col && Math.Abs(prevCell.Row - cell.Row) == 1)
 			{
                 if (prevCell.Row < cell.Row)
                 {
@@ -98,7 +133,7 @@ namespace flow
         public LinkedListNode<Cell> AddBefore(LinkedListNode<Cell> toAddBefore, Cell cell)
         {
             var prevCell = toAddBefore.Value;
-            if (prevCell.Row == cell.Row)
+            if (prevCell.Row == cell.Row && Math.Abs(prevCell.Col - cell.Col) == 1)
             {
                 if (cell.Col < prevCell.Col)
                 {
@@ -111,7 +146,7 @@ namespace flow
                     prevCell.AddPipe(PipeDirection.Right);
                 }
             }
-            if (prevCell.Col == cell.Col)
+            if (prevCell.Col == cell.Col && Math.Abs(prevCell.Row - cell.Row) == 1)
             {
                 if (prevCell.Row < cell.Row)
                 {

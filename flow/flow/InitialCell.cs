@@ -20,10 +20,11 @@ namespace flow
 
         public override void Draw(Graphics formGraphics)
         {
+			
             Pipes.Graphics = formGraphics;
             Pipes.Big(Point.X, Point.Y, Width, Height, Color);
             //formGraphics.DrawString($"{String.Join(",", PipeDirection)}", SystemFonts.MessageBoxFont, Brushes.White, 500, 200);
-            if (PipeDirection.Count > 0)
+            if (PipeDirection.Any())
             {
                 switch (PipeDirection.Peek())
                 {
@@ -65,6 +66,6 @@ namespace flow
             if (PipeDirection.Count == 1)
                 PipeDirection.Dequeue();
             PipeDirection.Enqueue(pipeDirection);
-        }
+		}
     }
 }
