@@ -7,11 +7,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace flow
 {
-	public partial class Form3 : Form
+	public partial class MainGameForm : Form
 	{
         public Grid Grid { get; set; } = Grid.Empty;
         public bool MouseIsDown { get; set; }
@@ -23,10 +24,20 @@ namespace flow
 	    public Graphics GraphicsTest { get; set; }
 		public int UpDownStart { get; set; } // 1 up, -1 down
 
-        public Form3()
+        public int ConnectedPipes { get; set; }
+
+        public Stopwatch TimeElapsed { get; set; }
+
+
+        //Added
+        public Dictionary<string, Levels> Users { get; set; }
+
+        public MainGameForm()
 		{
 			InitializeComponent();
             this.DoubleBuffered = true;
+            Users = new Dictionary<string, Levels>();
+            TimeElapsed = new Stopwatch();
 		}
 
 		private void Form3_Paint(object sender, PaintEventArgs e)
@@ -221,9 +232,7 @@ namespace flow
 
 				if (!Grid.AreAdjacent(PrevCell, Cell))
 					return;
-
-				// TODO ERROR
-				// clear on touch self
+                
 				if (Cell is NormalCell &&
 					beforeColor != Color.Black && 
 					beforeColor == FirstColor && 
@@ -342,5 +351,20 @@ namespace flow
             label2.Text = "";
             Invalidate();
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            if (menu.Visible == true)
+            {
+                showMenu.Text = "Hide Menu";
+                menu.Visible = false;
+                showMenu.Text = "Show Menu";
+            } else
+            {
+                showMenu.Text = "Show Menu";
+                menu.Visible = true;
+                showMenu.Text = "Hide Menu";
+            }   
+        }        
     }
 }

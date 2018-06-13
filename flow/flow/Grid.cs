@@ -28,6 +28,7 @@ namespace flow
         private int Size { get; set; }
         public Graphics formGraphics { get; set; }
         public static Grid Empty { get; } = new Grid(5, 500, 500);
+        public int CompletedPipes { get; set; }
 
         public Grid(int n, int width, int height, List<Cell> initialCells = null)
         {

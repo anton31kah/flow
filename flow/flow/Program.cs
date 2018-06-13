@@ -16,8 +16,9 @@ namespace flow
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new Coloring());
-            Application.Run(new Form3());
+            var loginForm = new LoginForm();
+            loginForm.Show();
+            Application.Run();
         }
 	}
 }
