@@ -36,7 +36,7 @@ namespace flow
             CountInRowCol = countInRowCol;
             MaxWidthHeight = maxWidthHeight;
             Color = color;
-            Point = new Point { X = Col * MaxWidthHeight / CountInRowCol + 200, Y = Row * MaxWidthHeight / CountInRowCol };
+            Point = new Point { X = Col * MaxWidthHeight / CountInRowCol, Y = Row * MaxWidthHeight / CountInRowCol };
             Width = Height = MaxWidthHeight / CountInRowCol;
             Path = new LinkedList<Cell>();
         }

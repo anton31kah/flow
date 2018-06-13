@@ -9,164 +9,159 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Windows.Forms;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace flow
 {
-	public partial class MainGameForm : Form
-	{
-        public Grid Grid { get; set; } = Grid.Empty;
+    public partial class MainGameForm : Form
+    {
+        public User UserPlayer { get; set; }
         public bool MouseIsDown { get; set; }
-        public Color FirstColor { get; set; }
         public bool GridIsSet { get; set; }
         public int PreviousLevel { get; set; }
         public LinkedListNode<Cell> LastVisitedCell { get; set; }
-	    public Cell PrevCell { get; set; }
-	    public Graphics GraphicsTest { get; set; }
-		public int UpDownStart { get; set; } // 1 up, -1 down
-
-        public int ConnectedPipes { get; set; }
-
-        public Stopwatch TimeElapsed { get; set; }
+        public Cell PrevCell { get; set; }
+        public int UpDownStart { get; set; } // 1 up, -1 down
 
 
         //Added
-        public Dictionary<string, Levels> Users { get; set; }
+        //public Dictionary<string, Levels> Users { get; set; }
 
-        public MainGameForm()
-		{
-			InitializeComponent();
+        public MainGameForm(User user)
+        {
+            InitializeComponent();
             this.DoubleBuffered = true;
-            Users = new Dictionary<string, Levels>();
-            TimeElapsed = new Stopwatch();
-		}
+            UserPlayer = user;
+        }
 
-		private void Form3_Paint(object sender, PaintEventArgs e)
-		{
-		    GraphicsTest = e.Graphics;
+        private void Form3_Paint(object sender, PaintEventArgs e)
+        {
             e.Graphics.Clear(Color.Black);
-            Grid.formGraphics = e.Graphics;
-			Grid.Draw();
+            UserPlayer.MyGame.Grid.formGraphics = e.Graphics;
+            UserPlayer.MyGame.Grid.Draw();
+            UserPlayer.Levels.Draw(e.Graphics);
         }
 
         private void Form3_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Left || e.X > 500 || !GridIsSet)
                 return;
-            var Cell = Grid.GetCellUnderMouse(e.X, e.Y);
+            var Cell = UserPlayer.MyGame.Grid.GetCellUnderMouse(e.X, e.Y);
             if (Cell.Color == Color.Black)
                 return;
             MouseIsDown = true;
-            FirstColor = Cell.Color;
-            LastVisitedCell = Grid.Paths[FirstColor].LastAddedCell;
+            UserPlayer.MyGame.FirstColor = Cell.Color;
+            LastVisitedCell = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].LastAddedCell;
             PrevCell = Cell;
 
-			if (Cell is InitialCell && Grid.Paths[FirstColor].PathList.Count > 2)
-			{
-				var node = Grid.Paths[FirstColor].PathList.First;
-				while (node != null)
-				{
-					var next = node.Next;
-					if (node.Value is InitialCell)
-					{
-						foreach (Cell[] row in Grid.Cells)
-						{
-							foreach (Cell cell in row)
-							{
-								if (Equals(cell, node.Value))
-								{
-									node.Value.PipeDirection.Clear();
-									node.Value.IsConnected = false;
-									node.Value.NumberOfPipes = 0;
-									goto Outside;
-								}
-							}
-						}
-					}
-					if (node.Value is NormalCell)
-					{
-						Grid.Paths[FirstColor].PathList.Remove(node);
-						foreach (Cell[] row in Grid.Cells)
-						{
-							foreach (Cell cell in row)
-							{
-								if (Equals(cell, node.Value))
-								{
-									node.Value.PipeDirection.Clear();
-									node.Value.Color = Color.Black;
-									node.Value.IsConnected = false;
-									node.Value.NumberOfPipes = 0;
-									goto Outside;
-								}
-							}
-						}
-					}
-					Outside:
+            if (Cell is InitialCell && UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Count > 2)
+            {
+                var node = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First;
+                while (node != null)
+                {
+                    var next = node.Next;
+                    if (node.Value is InitialCell)
+                    {
+                        foreach (Cell[] row in UserPlayer.MyGame.Grid.Cells)
+                        {
+                            foreach (Cell cell in row)
+                            {
+                                if (Equals(cell, node.Value))
+                                {
+                                    node.Value.PipeDirection.Clear();
+                                    node.Value.IsConnected = false;
+                                    node.Value.NumberOfPipes = 0;
+                                    goto Outside;
+                                }
+                            }
+                        }
+                    }
+                    if (node.Value is NormalCell)
+                    {
+                        UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Remove(node);
+                        foreach (Cell[] row in UserPlayer.MyGame.Grid.Cells)
+                        {
+                            foreach (Cell cell in row)
+                            {
+                                if (Equals(cell, node.Value))
+                                {
+                                    node.Value.PipeDirection.Clear();
+                                    node.Value.Color = Color.Black;
+                                    node.Value.IsConnected = false;
+                                    node.Value.NumberOfPipes = 0;
+                                    goto Outside;
+                                }
+                            }
+                        }
+                    }
+                Outside:
 
-					node = next;
-					Invalidate();
-				}
-			}
-			else if (Grid.Paths[FirstColor].PathList.Count > 2) // started
-			{
-				if (UpDownStart == 1) // clear down
-				{
-					var node = Grid.Paths[FirstColor].PathList.Find(Cell)?.Next;
-					while (node?.Value is NormalCell)
-					{
-						var next = node.Next;
-						Grid.Paths[FirstColor].PathList.Remove(node);
-						foreach (Cell[] row in Grid.Cells)
-						{
-							foreach (Cell cell in row)
-							{
-								if (Equals(cell, node.Value))
-								{
-									node.Value.PipeDirection.Clear();
-									node.Value.Color = Color.Black;
-									node.Value.IsConnected = false;
-									node.Value.NumberOfPipes = 0;
-									goto Outside;
-								}
-							}
-						}
-						Outside:
-						node = next;
-					}
-					//Invalidate();
-				}
-				else // clear up
-				{
-					var node = Grid.Paths[FirstColor].PathList.Find(Cell)?.Previous;
-					while (node?.Value is NormalCell)
-					{
-						var prev = node.Previous;
-						Grid.Paths[FirstColor].PathList.Remove(node);
-						foreach (Cell[] row in Grid.Cells)
-						{
-							foreach (Cell cell in row)
-							{
-								if (Equals(cell, node.Value))
-								{
-									node.Value.PipeDirection.Clear();
-									node.Value.Color = Color.Black;
-									node.Value.IsConnected = false;
-									node.Value.NumberOfPipes = 0;
-									goto Outside;
-								}
-							}
-						}
-						Outside:
-						node = prev;
-					}
-				}
-			}
+                    node = next;
+                    Invalidate();
+                }
+            }
+            else if (UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Count > 2) // started
+            {
+                if (UpDownStart == 1) // clear down
+                {
+                    var node = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Find(Cell)?.Next;
+                    while (node?.Value is NormalCell)
+                    {
+                        var next = node.Next;
+                        UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Remove(node);
+                        foreach (Cell[] row in UserPlayer.MyGame.Grid.Cells)
+                        {
+                            foreach (Cell cell in row)
+                            {
+                                if (Equals(cell, node.Value))
+                                {
+                                    node.Value.PipeDirection.Clear();
+                                    node.Value.Color = Color.Black;
+                                    node.Value.IsConnected = false;
+                                    node.Value.NumberOfPipes = 0;
+                                    goto Outside;
+                                }
+                            }
+                        }
+                    Outside:
+                        node = next;
+                    }
+                    //Invalidate();
+                }
+                else // clear up
+                {
+                    var node = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Find(Cell)?.Previous;
+                    while (node?.Value is NormalCell)
+                    {
+                        var prev = node.Previous;
+                        UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Remove(node);
+                        foreach (Cell[] row in UserPlayer.MyGame.Grid.Cells)
+                        {
+                            foreach (Cell cell in row)
+                            {
+                                if (Equals(cell, node.Value))
+                                {
+                                    node.Value.PipeDirection.Clear();
+                                    node.Value.Color = Color.Black;
+                                    node.Value.IsConnected = false;
+                                    node.Value.NumberOfPipes = 0;
+                                    goto Outside;
+                                }
+                            }
+                        }
+                    Outside:
+                        node = prev;
+                    }
+                }
+            }
 
 
-			if (Equals(Cell, Grid.Paths[FirstColor].PathList.First.Value))
-				UpDownStart = 1;
-			else if (Equals(Cell, Grid.Paths[FirstColor].PathList.Last.Value))
-				UpDownStart = -1;
-		}
+            if (Equals(Cell, UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First.Value))
+                UpDownStart = 1;
+            else if (Equals(Cell, UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Last.Value))
+                UpDownStart = -1;
+        }
 
         private void Form3_MouseUp(object sender, MouseEventArgs e)
         {
@@ -178,164 +173,164 @@ namespace flow
             label1.Text = PreviousLevel.ToString();
             if (MouseIsDown)
             {
-                var Cell = Grid.GetCellUnderMouse(e.X, e.Y);
+                var Cell = UserPlayer.MyGame.Grid.GetCellUnderMouse(e.X, e.Y);
 
-				Color beforeColor = Cell.Color;
+                Color beforeColor = Cell.Color;
 
-				// clear on touch another
-				if (beforeColor != Color.Black && beforeColor != FirstColor)
-				{
-					var node = Grid.Paths[beforeColor].PathList.First;
-					while (node != null)
-					{
-						var next = node.Next;
-						if (node.Value is InitialCell)
-						{
-							foreach (Cell[] row in Grid.Cells)
-							{
-								foreach (Cell cell in row)
-								{
-									if (Equals(cell, node.Value))
-									{
-										node.Value.PipeDirection.Clear();
-										node.Value.IsConnected = false;
-										node.Value.NumberOfPipes = 0;
-										goto Outside;
-									}
-								}
-							}
-						}
-						if (node.Value is NormalCell)
-						{
-							Grid.Paths[beforeColor].PathList.Remove(node);
-							foreach (Cell[] row in Grid.Cells)
-							{
-								foreach (Cell cell in row)
-								{
-									if (Equals(cell, node.Value))
-									{
-										node.Value.PipeDirection.Clear();
-										node.Value.Color = Color.Black;
-										node.Value.IsConnected = false;
-										node.Value.NumberOfPipes = 0;
-										goto Outside;
-									}
-								}
-							}
-						}
-						Outside:
-
-						node = next;
-						Invalidate();
-					}
-				}
-
-				if (!Grid.AreAdjacent(PrevCell, Cell))
-					return;
-                
-				if (Cell is NormalCell &&
-					beforeColor != Color.Black && 
-					beforeColor == FirstColor && 
-					Grid.Paths[FirstColor].PathList.Contains(Cell) &&
-					!Equals(Grid.Paths[FirstColor].PathList.First.Next?.Value, Cell) &&
-					!Equals(Grid.Paths[FirstColor].PathList.Last.Previous?.Value, Cell))
-				{
-					if (UpDownStart == 1) // clear down
-					{
-						var node = Grid.Paths[FirstColor].PathList.Find(Cell)?.Next;
-						while (node?.Value is NormalCell)
-						{
-							var next = node.Next;
-							Grid.Paths[FirstColor].PathList.Remove(node);
-							foreach (Cell[] row in Grid.Cells)
-							{
-								foreach (Cell cell in row)
-								{
-									if (Equals(cell, node.Value))
-									{
-										node.Value.PipeDirection.Clear();
-										node.Value.Color = Color.Black;
-										node.Value.IsConnected = false;
-										node.Value.NumberOfPipes = 0;
-										goto Outside;
-									}
-								}
-							}
-							Outside:
-							node = next;
-						}
-						//Invalidate();
-					}
-					else // clear up
-					{
-						var node = Grid.Paths[FirstColor].PathList.Find(Cell)?.Previous;
-						while (node?.Value is NormalCell)
-						{
-							var prev = node.Previous;
-							Grid.Paths[FirstColor].PathList.Remove(node);
-							foreach (Cell[] row in Grid.Cells)
-							{
-								foreach (Cell cell in row)
-								{
-									if (Equals(cell, node.Value))
-									{
-										node.Value.PipeDirection.Clear();
-										node.Value.Color = Color.Black;
-										node.Value.IsConnected = false;
-										node.Value.NumberOfPipes = 0;
-										goto Outside;
-									}
-								}
-							}
-							Outside:
-							node = prev;
-						}
-					}
-				}
-
-				
-
-				if (!(Cell is InitialCell) && !Grid.Paths[FirstColor].PathList.Contains(Cell))
+                // clear on touch another
+                if (beforeColor != Color.Black && beforeColor != UserPlayer.MyGame.FirstColor)
                 {
-                    Cell.Color = FirstColor;
+                    var node = UserPlayer.MyGame.Grid.Paths[beforeColor].PathList.First;
+                    while (node != null)
+                    {
+                        var next = node.Next;
+                        if (node.Value is InitialCell)
+                        {
+                            foreach (Cell[] row in UserPlayer.MyGame.Grid.Cells)
+                            {
+                                foreach (Cell cell in row)
+                                {
+                                    if (Equals(cell, node.Value))
+                                    {
+                                        node.Value.PipeDirection.Clear();
+                                        node.Value.IsConnected = false;
+                                        node.Value.NumberOfPipes = 0;
+                                        goto Outside;
+                                    }
+                                }
+                            }
+                        }
+                        if (node.Value is NormalCell)
+                        {
+                            UserPlayer.MyGame.Grid.Paths[beforeColor].PathList.Remove(node);
+                            foreach (Cell[] row in UserPlayer.MyGame.Grid.Cells)
+                            {
+                                foreach (Cell cell in row)
+                                {
+                                    if (Equals(cell, node.Value))
+                                    {
+                                        node.Value.PipeDirection.Clear();
+                                        node.Value.Color = Color.Black;
+                                        node.Value.IsConnected = false;
+                                        node.Value.NumberOfPipes = 0;
+                                        goto Outside;
+                                    }
+                                }
+                            }
+                        }
+                    Outside:
 
-					if (UpDownStart == 1)
-						LastVisitedCell = Grid.Paths[FirstColor].PathList.AddBefore(Grid.Paths[FirstColor].PathList.Last, Cell);
-					else
-						LastVisitedCell = Grid.Paths[FirstColor].PathList.AddAfter(Grid.Paths[FirstColor].PathList.First, Cell);
+                        node = next;
+                        Invalidate();
+                    }
+                }
 
-					Grid.Paths[FirstColor].Update();
-                    label2.Text = Grid.Paths[FirstColor].ToString();
-                    
+                if (!UserPlayer.MyGame.Grid.AreAdjacent(PrevCell, Cell))
+                    return;
+
+                if (Cell is NormalCell &&
+                    beforeColor != Color.Black &&
+                    beforeColor == UserPlayer.MyGame.FirstColor &&
+                    UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Contains(Cell) &&
+                    !Equals(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First.Next?.Value, Cell) &&
+                    !Equals(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Last.Previous?.Value, Cell))
+                {
+                    if (UpDownStart == 1) // clear down
+                    {
+                        var node = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Find(Cell)?.Next;
+                        while (node?.Value is NormalCell)
+                        {
+                            var next = node.Next;
+                            UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Remove(node);
+                            foreach (Cell[] row in UserPlayer.MyGame.Grid.Cells)
+                            {
+                                foreach (Cell cell in row)
+                                {
+                                    if (Equals(cell, node.Value))
+                                    {
+                                        node.Value.PipeDirection.Clear();
+                                        node.Value.Color = Color.Black;
+                                        node.Value.IsConnected = false;
+                                        node.Value.NumberOfPipes = 0;
+                                        goto Outside;
+                                    }
+                                }
+                            }
+                        Outside:
+                            node = next;
+                        }
+                        //Invalidate();
+                    }
+                    else // clear up
+                    {
+                        var node = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Find(Cell)?.Previous;
+                        while (node?.Value is NormalCell)
+                        {
+                            var prev = node.Previous;
+                            UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Remove(node);
+                            foreach (Cell[] row in UserPlayer.MyGame.Grid.Cells)
+                            {
+                                foreach (Cell cell in row)
+                                {
+                                    if (Equals(cell, node.Value))
+                                    {
+                                        node.Value.PipeDirection.Clear();
+                                        node.Value.Color = Color.Black;
+                                        node.Value.IsConnected = false;
+                                        node.Value.NumberOfPipes = 0;
+                                        goto Outside;
+                                    }
+                                }
+                            }
+                        Outside:
+                            node = prev;
+                        }
+                    }
+                }
+
+
+
+                if (!(Cell is InitialCell) && !UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Contains(Cell))
+                {
+                    Cell.Color = UserPlayer.MyGame.FirstColor;
+
+                    if (UpDownStart == 1)
+                        LastVisitedCell = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.AddBefore(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Last, Cell);
+                    else
+                        LastVisitedCell = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.AddAfter(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First, Cell);
+
+                    UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].Update();
+                    label2.Text = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].ToString();
+
                     PrevCell = Cell;
                     Invalidate();
-                    Pipes.Graphics = Grid.formGraphics;
+                    Pipes.Graphics = UserPlayer.MyGame.Grid.formGraphics;
 
                 }
 
-				if (Cell is InitialCell && Grid.Paths[FirstColor].PathList.Count > 2 && (Grid.Paths[FirstColor].PathList.Last.Value.Equals(Cell) || Grid.Paths[FirstColor].PathList.First.Value.Equals(Cell)))
-				{
-					label2.Text = "OVER";
-					Invalidate();
-				}
-			}
+                if (Cell is InitialCell && UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Count > 2 && (UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Last.Value.Equals(Cell) || UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First.Value.Equals(Cell)))
+                {
+                    label2.Text = "OVER";
+                    Invalidate();
+                }
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             if (!int.TryParse(textBox1.Text, out int level))
             {
-				GridIsSet = true;
-				Grid = Levels.RegularLevels[6][1];
+                GridIsSet = true;
+                UserPlayer.MyGame.Grid = UserPlayer.Levels.RegularLevels[6][1];
             }
             else
             {
                 GridIsSet = true;
-                Grid = Levels.RegularLevels[6][level];
+                UserPlayer.MyGame.Grid = UserPlayer.Levels.RegularLevels[6][level];
                 if (PreviousLevel != 0 && level != PreviousLevel)
                 {
-					//MessageBox.Show($"previous {PreviousLevel}, level {level}");
-					Levels.RegularLevels[6][PreviousLevel].Reset();
+                    //MessageBox.Show($"previous {PreviousLevel}, level {level}");
+                    UserPlayer.Levels.RegularLevels[6][PreviousLevel].Reset();
 
                 }
             }
@@ -347,7 +342,7 @@ namespace flow
         {
             if (PreviousLevel == 0)
                 PreviousLevel = 1;
-			Levels.RegularLevels[6][PreviousLevel].Reset();
+            UserPlayer.Levels.RegularLevels[6][PreviousLevel].Reset();
             label2.Text = "";
             Invalidate();
         }
@@ -359,12 +354,26 @@ namespace flow
                 showMenu.Text = "Hide Menu";
                 menu.Visible = false;
                 showMenu.Text = "Show Menu";
-            } else
+            }
+            else
             {
                 showMenu.Text = "Show Menu";
                 menu.Visible = true;
                 showMenu.Text = "Hide Menu";
-            }   
-        }        
+            }
+        }
+
+        private void MainGameForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.Exit();
+        }
+
+        public void SaveFile()
+        {
+            string fileName = UserPlayer.Name;
+            BinaryFormatter formatter = new BinaryFormatter();
+            using (FileStream file = File.Create("../../SaveGames/" + fileName + ".flw"))
+                formatter.Serialize(file, UserPlayer);
+        }
     }
 }

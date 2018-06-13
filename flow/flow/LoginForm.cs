@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace flow
 {
@@ -26,16 +27,22 @@ namespace flow
 
         private void loginButton_Click(object sender, EventArgs e)
         {
+            string fileName = loginTextbox.Text;
             if (loginButton.Text == "Continue Game")
             {
-                var mainGameForm = new MainGameForm();
+                User user = OpenFile(fileName);
+                var mainGameForm = new MainGameForm(user);
                 mainGameForm.Show();
                 GameStarted = true;
                 Close();
             }
             else
             {
-                // create user and append to users
+                User user = new User(fileName);
+                var mainGameForm = new MainGameForm(user);
+                mainGameForm.Show();
+                GameStarted = true;
+                Close();
             }
         }
 
@@ -53,6 +60,18 @@ namespace flow
                 loginButton.Text = "Continue Game";
             else
                 loginButton.Text = "Create Profile";
+        }
+
+        public User OpenFile(string fileName)
+        {
+            User user = null;
+            if (fileName != null)
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                using (FileStream file = File.OpenRead("../../SaveGames/" + fileName + ".flw"))
+                    user = (User)formatter.Deserialize(file);
+            }
+            return user;
         }
     }
 }

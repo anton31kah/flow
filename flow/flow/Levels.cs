@@ -2632,5 +2632,35 @@ namespace flow
 				}
 			}
 		};
+
+        public void Draw(Graphics graphics)
+        {
+            // draw upper row (groups)
+            int width = 750;
+            int height = 60;
+            Color[] colors = { Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Orange };
+            for (int i = 5; i <= 9; i++, width += 55)
+            {
+                graphics.DrawRectangle(new Pen(colors[i - 5], 1), width, height, 50, 50);
+                var stringSize = graphics.MeasureString($"{i}", new Font("Arial", 15));
+                graphics.DrawString($"{i}", new Font("Arial", 15), new SolidBrush(colors[i - 5]), (float)(width + (25 - stringSize.Width / 2.0)), (float)(height + (25 - stringSize.Height / 2.0)));
+            }
+
+            // draw levels
+            height = 160;
+            width = 750;
+            for (int i = 1; i <= 30; i++, width += 55)
+            {
+                graphics.DrawRectangle(Pens.White, width, height, 50, 50);
+                var stringSize = graphics.MeasureString($"{i}", new Font("Arial", 15));
+                graphics.DrawString($"{i}", new Font("Arial", 15), Brushes.White, (float) (width + (25 - stringSize.Width / 2.0)), (float) (height + (25 - stringSize.Height / 2.0)));
+
+                if (i % 5 == 0)
+                {
+                    width = 695;
+                    height += 55;
+                }
+            }
+        }
 	}
 }

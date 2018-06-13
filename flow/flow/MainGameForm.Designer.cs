@@ -82,7 +82,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.ForeColor = System.Drawing.Color.White;
-            this.label2.Location = new System.Drawing.Point(721, 9);
+            this.label2.Location = new System.Drawing.Point(878, 17);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(46, 17);
             this.label2.TabIndex = 4;
@@ -94,7 +94,7 @@
             this.menu.Controls.Add(this.textBox1);
             this.menu.Controls.Add(this.label1);
             this.menu.Controls.Add(this.button2);
-            this.menu.Location = new System.Drawing.Point(1, 231);
+            this.menu.Location = new System.Drawing.Point(494, 220);
             this.menu.Name = "menu";
             this.menu.Size = new System.Drawing.Size(254, 268);
             this.menu.TabIndex = 5;
@@ -102,7 +102,7 @@
             // 
             // showMenu
             // 
-            this.showMenu.Location = new System.Drawing.Point(12, 180);
+            this.showMenu.Location = new System.Drawing.Point(520, 176);
             this.showMenu.Name = "showMenu";
             this.showMenu.Size = new System.Drawing.Size(122, 32);
             this.showMenu.TabIndex = 6;
@@ -115,7 +115,7 @@
             this.connPipes.AutoSize = true;
             this.connPipes.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.connPipes.ForeColor = System.Drawing.SystemColors.Control;
-            this.connPipes.Location = new System.Drawing.Point(13, 13);
+            this.connPipes.Location = new System.Drawing.Point(520, 9);
             this.connPipes.Name = "connPipes";
             this.connPipes.Size = new System.Drawing.Size(102, 25);
             this.connPipes.TabIndex = 7;
@@ -126,7 +126,7 @@
             this.solvTime.AutoSize = true;
             this.solvTime.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.solvTime.ForeColor = System.Drawing.SystemColors.Control;
-            this.solvTime.Location = new System.Drawing.Point(13, 61);
+            this.solvTime.Location = new System.Drawing.Point(520, 57);
             this.solvTime.Name = "solvTime";
             this.solvTime.Size = new System.Drawing.Size(117, 25);
             this.solvTime.TabIndex = 8;
@@ -137,7 +137,7 @@
             this.pipeFinishedLabel.AutoSize = true;
             this.pipeFinishedLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.pipeFinishedLabel.ForeColor = System.Drawing.SystemColors.Control;
-            this.pipeFinishedLabel.Location = new System.Drawing.Point(13, 112);
+            this.pipeFinishedLabel.Location = new System.Drawing.Point(520, 108);
             this.pipeFinishedLabel.Name = "pipeFinishedLabel";
             this.pipeFinishedLabel.Size = new System.Drawing.Size(91, 25);
             this.pipeFinishedLabel.TabIndex = 9;
@@ -159,6 +159,7 @@
             this.MaximizeBox = false;
             this.Name = "MainGameForm";
             this.Text = "Flow - UserName";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainGameForm_FormClosed);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form3_Paint);
             this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form3_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form3_MouseMove);
