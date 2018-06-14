@@ -101,5 +101,8 @@
   <ItemGroup>
     <None Include="Resources\FLOW.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SaveGames\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
