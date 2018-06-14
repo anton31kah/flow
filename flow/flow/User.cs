@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace flow
 {
-	[Serializable]
+    [Serializable]
     public class User
     {
+        [NonSerialized] private bool _changedSomething = false;
+
         public Levels Levels { get; set; }
         public Game MyGame { get; set; }
         public string Name { get; set; }
-		public Dictionary<int, HashSet<int>> SolvedLevels { get; set; } = new Dictionary<int, HashSet<int>>();
+        public Dictionary<int, HashSet<int>> SolvedLevels { get; set; } = new Dictionary<int, HashSet<int>>();
         public int CompletedLevels => SolvedLevels.Values.Sum(s => s.Count);
-		public bool ChangedSomething { get; set; }
+        public bool ChangedSomething
+        {
+            get => _changedSomething;
+            set => _changedSomething = value;
+        }
 
         public User(string name)
         {
@@ -23,9 +27,14 @@ namespace flow
             Levels = new Levels();
         }
 
-		public override string ToString()
-		{
-			return String.Join(";;", SolvedLevels.Select(e => $"{e.Key} {String.Join(", ", e.Value)}"));
-		}
-	}
+        public override string ToString()
+        {
+            return String.Join(";;", SolvedLevels.Select(e => $"{e.Key} {String.Join(", ", e.Value)}"));
+        }
+
+        public bool IsLevelSolved(int group, int level)
+        {
+            return SolvedLevels.ContainsKey(group) && SolvedLevels[group].Contains(level);
+        }
+    }
 }

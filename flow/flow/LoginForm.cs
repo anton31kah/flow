@@ -15,7 +15,7 @@ namespace flow
     public partial class LoginForm : Form
     {
         public bool GameStarted { get; set; }
-		public User User { get; set; }
+        public User User { get; set; }
 
         public LoginForm()
         {
@@ -29,25 +29,21 @@ namespace flow
         private void loginButton_Click(object sender, EventArgs e)
         {
             string fileName = loginTextbox.Text;
-			if (String.IsNullOrWhiteSpace(fileName))
-				return;
+            if (String.IsNullOrWhiteSpace(fileName))
+                return;
             if (loginButton.Text == "Continue Game")
             {
-				if (User == null)
-					OpenFile(fileName);
-                var mainGameForm = new MainGameForm(User);
-                mainGameForm.Show();
-                GameStarted = true;
-                Close();
+                if (User == null)
+                    OpenFile(fileName);
             }
             else
             {
                 User user = new User(fileName);
-                var mainGameForm = new MainGameForm(user);
-                mainGameForm.Show();
-                GameStarted = true;
-                Close();
             }
+            var mainGameForm = new MainGameForm(user);
+            mainGameForm.Show();
+            GameStarted = true;
+            Close();
         }
 
         private void LoginForm_FormClosed(object sender, FormClosedEventArgs e)
@@ -61,12 +57,12 @@ namespace flow
             if (String.IsNullOrWhiteSpace(loginTextbox.Text)) return;
             var files = Directory.GetFiles("../../SaveGames").Select(f => f.Substring(16, f.Length - 20)).ToArray();
             if (files.Contains(loginTextbox.Text))
-			{ 
+            {
                 loginButton.Text = "Continue Game";
-				OpenFile(loginTextbox.Text);
-				completedLevelsLabel.Text = $"Completed Levels: {User.CompletedLevels}/150";
-			}
-			else
+                OpenFile(loginTextbox.Text);
+                completedLevelsLabel.Text = $"Completed Levels: {User.CompletedLevels}/150";
+            }
+            else
                 loginButton.Text = "Create Profile";
         }
 
