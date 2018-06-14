@@ -387,7 +387,8 @@ namespace flow
             elapsedTimeLabel.Text = "Time: 00:00";
             pipeFinishedLabel.Text = $"Pipe: {UserPlayer.MyGame.Grid.FinishedPercent}%";
             UserPlayer.MyGame.Grid.TimeElapsed = new TimeSpan();
-            UserPlayer.SolvedLevels[UserPlayer.MyGame.LevelGroup].Remove(UserPlayer.MyGame.LevelNumber);
+            if (UserPlayer.IsLevelSolved(UserPlayer.MyGame.LevelGroup,UserPlayer.MyGame.LevelNumber))
+                UserPlayer.SolvedLevels[UserPlayer.MyGame.LevelGroup].Remove(UserPlayer.MyGame.LevelNumber);
 
             Invalidate();
         }

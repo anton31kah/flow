@@ -38,9 +38,9 @@ namespace flow
             }
             else
             {
-                User user = new User(fileName);
+                User = new User(fileName);
             }
-            var mainGameForm = new MainGameForm(user);
+            var mainGameForm = new MainGameForm(User);
             mainGameForm.Show();
             GameStarted = true;
             Close();
