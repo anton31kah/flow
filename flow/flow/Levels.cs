@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace flow
 {
+	[Serializable]
 	public class Levels
 	{
 		public static int Width = 500;
@@ -2633,27 +2635,77 @@ namespace flow
 			}
 		};
 
-        public void Draw(Graphics graphics)
-        {
+		public int IsGroupOrLevelUnderMouse(int x, int y, out int groupLevel)
+		{
+			if (y >= 60 && y <= 110)
+			{
+				int width = 750;
+				int height = 60;
+				for (int i = 5; i <= 9; i++, width += 55)
+				{
+					if (x >= width && x <= width + 50 && y >= height && y <= height + 50)
+					{
+						groupLevel = i;
+						return 1;
+					}
+				}
+			}
+			else if (y >= 160 && y <= 490)
+			{
+				int height = 160;
+				int width = 750;
+				for (int i = 1; i <= 30; i++, width += 55)
+				{
+					if (x >= width && x <= width + 50 && y >= height && y <= height + 50)
+					{
+						groupLevel = i;
+						return -1;
+					}
+
+					if (i % 5 == 0)
+					{
+						width = 695;
+						height += 55;
+					}
+				}
+			}
+
+			groupLevel = 0;
+			return 0;
+		}
+
+        public void Draw(Graphics graphics, int selectedGroup, int selectedLevel, Dictionary<int, HashSet<int>> solvedLevels)
+		{
             // draw upper row (groups)
             int width = 750;
             int height = 60;
             Color[] colors = { Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Orange };
-            for (int i = 5; i <= 9; i++, width += 55)
+			Color[] colorsFaded = {Color.LightCoral, Color.LightGreen, Color.LightBlue, Color.LightYellow, Color.LightSalmon};
+			for (int i = 5; i <= 9; i++, width += 55)
             {
-                graphics.DrawRectangle(new Pen(colors[i - 5], 1), width, height, 50, 50);
+				if (i == selectedGroup || solvedLevels.ContainsKey(selectedGroup) && solvedLevels[selectedGroup].Count == 30)
+					graphics.FillRectangle(new SolidBrush(colorsFaded[i - 5]), width, height, 50, 50);
+
+				graphics.DrawRectangle(new Pen(colors[i - 5], 1), width, height, 50, 50);
                 var stringSize = graphics.MeasureString($"{i}", new Font("Arial", 15));
-                graphics.DrawString($"{i}", new Font("Arial", 15), new SolidBrush(colors[i - 5]), (float)(width + (25 - stringSize.Width / 2.0)), (float)(height + (25 - stringSize.Height / 2.0)));
-            }
+				graphics.DrawString($"{i}", new Font("Arial", 15), new SolidBrush(colors[i - 5]), (float)(width + (25 - stringSize.Width / 2.0)), (float)(height + (25 - stringSize.Height / 2.0)));
+			}
 
             // draw levels
             height = 160;
             width = 750;
             for (int i = 1; i <= 30; i++, width += 55)
-            {
-                graphics.DrawRectangle(Pens.White, width, height, 50, 50);
+			{
+				var c = Color.Black;
+				if (i == selectedLevel || solvedLevels.ContainsKey(selectedGroup) && solvedLevels[selectedGroup].Contains(i))
+				{
+					c = colorsFaded[selectedGroup - 5];
+					graphics.FillRectangle(new SolidBrush(colorsFaded[selectedGroup - 5]), width, height, 50, 50);
+				}
+				graphics.DrawRectangle(Pens.White, width, height, 50, 50);
                 var stringSize = graphics.MeasureString($"{i}", new Font("Arial", 15));
-                graphics.DrawString($"{i}", new Font("Arial", 15), Brushes.White, (float) (width + (25 - stringSize.Width / 2.0)), (float) (height + (25 - stringSize.Height / 2.0)));
+				var textColorBrush = c.R / 255.0 + c.G / 255.0 + c.B / 255.0 < 1.5 ? Brushes.White : Brushes.Black;
+				graphics.DrawString($"{i}", new Font("Arial", 15), textColorBrush, (float) (width + (25 - stringSize.Width / 2.0)), (float) (height + (25 - stringSize.Height / 2.0)));
 
                 if (i % 5 == 0)
                 {

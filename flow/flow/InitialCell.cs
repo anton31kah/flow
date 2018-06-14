@@ -8,7 +8,8 @@ using System.Windows.Forms;
 
 namespace flow
 {
-    public class InitialCell : Cell
+	[Serializable]
+	public class InitialCell : Cell
     {
 		//public PipeDirection PipeDirection { get; set; }
 

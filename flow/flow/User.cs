@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 
 namespace flow
 {
+	[Serializable]
     public class User
     {
         public Levels Levels { get; set; }
         public Game MyGame { get; set; }
         public string Name { get; set; }
-        public int CompletedLevels => Levels.RegularLevels.SelectMany(l => l.Value.Select(l2 => l2.Value)).Count(g => g.CompletedPipes > 0);
+		public Dictionary<int, HashSet<int>> SolvedLevels { get; set; } = new Dictionary<int, HashSet<int>>();
+        public int CompletedLevels => SolvedLevels.Values.Sum(s => s.Count);
+		public bool ChangedSomething { get; set; }
 
         public User(string name)
         {
@@ -19,5 +22,10 @@ namespace flow
             MyGame = new Game();
             Levels = new Levels();
         }
-    }
+
+		public override string ToString()
+		{
+			return String.Join(";;", SolvedLevels.Select(e => $"{e.Key} {String.Join(", ", e.Value)}"));
+		}
+	}
 }

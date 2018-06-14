@@ -1,18 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace flow
 {
-    public class Path
+	[Serializable]
+	public class Path /*: ISerializable*/
     {
-        public LinkedList<Cell> PathList { get; set; }
-        public LinkedListNode<Cell> LastAddedCell { get; set; }
+		[NonSerialized] private LinkedListNode<Cell> _lastAddedCell;
+
+		public LinkedList<Cell> PathList { get; set; }
+
+		public LinkedListNode<Cell> LastAddedCell
+		{
+			get => _lastAddedCell;
+			set => _lastAddedCell = value;
+		}
 
 
-        public Path(Cell initialCell, Cell lastCell)
+		public Path(Cell initialCell, Cell lastCell)
         {
             PathList = new LinkedList<Cell>();
             PathList.AddFirst(initialCell);
@@ -24,8 +33,19 @@ namespace flow
 			return String.Join(" -> \n", PathList);
 		}
 
-        //ERROR ============================================================================
-        public void Update()
+		//public void GetObjectData(SerializationInfo info, StreamingContext context)
+		//{
+		//	info.AddValue("PathList", PathList);
+		//	info.AddValue("LastAddedCell", LastAddedCell.Value);
+		//}
+
+		//public Path(SerializationInfo info, StreamingContext context)
+		//{
+		//	PathList = (LinkedList<Cell>) info.GetValue("PathList", typeof(LinkedList<Cell>));
+		//	LastAddedCell = (Cell) info.GetValue("LastAddedCell", typeof(Cell));
+		//}
+
+		public void Update()
         {
 			var current = PathList.First;
 			for (int i = 0, size = PathList.Count; i < size - 1; i++)
@@ -60,42 +80,7 @@ namespace flow
 
 				current = next;
 				next = next.Next;
-			}
-
-			//foreach (var prev in PathList)
-   //         {
-   //             foreach (var curr in PathList)
-   //             {
-   //                 if (!AreAdjacent(curr, prev))
-   //                     continue;
-   //                 if (prev.Row == curr.Row)
-   //                 {
-   //                     if (curr.Col < prev.Col)
-   //                     {
-   //                         curr.AddPipe(PipeDirection.Right);
-   //                         prev.AddPipe(PipeDirection.Left);
-   //                     }
-   //                     else if (curr.Col > prev.Col)
-   //                     {
-   //                         curr.AddPipe(PipeDirection.Left);
-   //                         prev.AddPipe(PipeDirection.Right);
-   //                     }
-   //                 }
-   //                 if (prev.Col == curr.Col)
-   //                 {
-   //                     if (prev.Row < curr.Row)
-   //                     {
-   //                         prev.AddPipe(PipeDirection.Down);
-   //                         curr.AddPipe(PipeDirection.Up);
-   //                     }
-   //                     else if (prev.Row > curr.Row)
-   //                     {
-   //                         prev.AddPipe(PipeDirection.Up);
-   //                         curr.AddPipe(PipeDirection.Down);
-   //                     }
-   //                 }
-   //             }
-   //         }
+			}			
         }
 
 		public LinkedListNode<Cell> AddAfter(LinkedListNode<Cell> toAddAfter, Cell cell)

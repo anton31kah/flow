@@ -15,6 +15,7 @@ namespace flow
     public partial class LoginForm : Form
     {
         public bool GameStarted { get; set; }
+		public User User { get; set; }
 
         public LoginForm()
         {
@@ -28,10 +29,13 @@ namespace flow
         private void loginButton_Click(object sender, EventArgs e)
         {
             string fileName = loginTextbox.Text;
+			if (String.IsNullOrWhiteSpace(fileName))
+				return;
             if (loginButton.Text == "Continue Game")
             {
-                User user = OpenFile(fileName);
-                var mainGameForm = new MainGameForm(user);
+				if (User == null)
+					OpenFile(fileName);
+                var mainGameForm = new MainGameForm(User);
                 mainGameForm.Show();
                 GameStarted = true;
                 Close();
@@ -57,21 +61,23 @@ namespace flow
             if (String.IsNullOrWhiteSpace(loginTextbox.Text)) return;
             var files = Directory.GetFiles("../../SaveGames").Select(f => f.Substring(16, f.Length - 20)).ToArray();
             if (files.Contains(loginTextbox.Text))
+			{ 
                 loginButton.Text = "Continue Game";
-            else
+				OpenFile(loginTextbox.Text);
+				completedLevelsLabel.Text = $"Completed Levels: {User.CompletedLevels}/150";
+			}
+			else
                 loginButton.Text = "Create Profile";
         }
 
-        public User OpenFile(string fileName)
+        public void OpenFile(string fileName)
         {
-            User user = null;
             if (fileName != null)
             {
                 BinaryFormatter formatter = new BinaryFormatter();
                 using (FileStream file = File.OpenRead("../../SaveGames/" + fileName + ".flw"))
-                    user = (User)formatter.Deserialize(file);
+                    User = (User)formatter.Deserialize(file);
             }
-            return user;
         }
     }
 }

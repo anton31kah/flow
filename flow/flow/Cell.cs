@@ -1,13 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace flow
 {
-    public enum Triangle
+	[Serializable]
+	public enum Triangle
     {
         North, South, East, West
     }
-    public abstract class Cell
+
+	[Serializable]
+	public abstract class Cell
     {
         // x -> col
         // y -> row

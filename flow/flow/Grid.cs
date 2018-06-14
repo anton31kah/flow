@@ -8,7 +8,8 @@ using System.Windows.Forms;
 
 namespace flow
 {
-    public class Grid
+	[Serializable]
+	public class Grid
     {
         /*
          *  Reactangle(x, y, Width, height);
@@ -18,17 +19,27 @@ namespace flow
          * 
          */
 
+		[NonSerialized] private Graphics _formGraphics;
 
         public Dictionary<Color, Path> Paths { get; set; }
         public Cell[][] Cells;
         private List<Cell> initialCells;
         public List<Cell> DrawnCells;
-        private int Width { get; set; }
+		private int Width { get; set; }
         private int Height { get; set; }
         private int Size { get; set; }
-        public Graphics formGraphics { get; set; }
-        public static Grid Empty { get; } = new Grid(5, 500, 500);
-        public int CompletedPipes { get; set; }
+
+		public Graphics FormGraphics
+		{
+			get => _formGraphics;
+			set => _formGraphics = value;
+		}
+
+		public static Grid Empty { get; } = new Grid(5, 500, 500);
+        //public int CompletedPipes { get; set; }
+		public Dictionary<Color, bool> CompletedPipes { get; set; } = new Dictionary<Color, bool>();
+		public int ConnectedCells => Paths.Select(p => p.Value.PathList.Count).Sum();
+		public int FinishedPercent => (int) (1.0 * ConnectedCells / (Size * Size) * 100);
 
         public Grid(int n, int width, int height, List<Cell> initialCells = null)
         {
@@ -87,7 +98,7 @@ namespace flow
         {
             foreach (Cell[] cells in Cells)
                 foreach (Cell cell in cells)
-                    cell.Draw(formGraphics);
+                    cell.Draw(FormGraphics);
         }
 
 		public Cell GetCellUnderMouse(int x, int y)

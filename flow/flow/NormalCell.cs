@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 
 namespace flow
 {
-    public class NormalCell : Cell
+	[Serializable]
+	public class NormalCell : Cell
     {
 		//public Queue<PipeDirection> PipeDirection { get; set; } = new Queue<PipeDirection>(2);
 
