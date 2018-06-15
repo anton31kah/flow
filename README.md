@@ -2,6 +2,8 @@
 
 ## by [Anton Kahwaji 161555](https://github.com/anton31kah) and [Oliver Dimitriov 161535](https://github.com/voirtimid)
 
+## [You can download it here](https://github.com/anton31kah/flow/releases)
+
 The goal of this game is to connect all colors without overlapping each other, and leaving no empty spaces.
 
 Inspired by: Flow Free from Big Duck Games, [You can find them here](https://www.bigduckgames.com/flowfree/)
