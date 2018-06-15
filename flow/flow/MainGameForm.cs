@@ -438,11 +438,6 @@ namespace flow
         private void logOutButton_Click(object sender, EventArgs e)
         {
             Close();
-            if (!UserPlayer.ChangedSomething)
-            {
-                var loginForm = new LoginForm();
-                loginForm.Show();
-            }
         }
     }
 }
