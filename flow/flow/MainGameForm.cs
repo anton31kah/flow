@@ -10,6 +10,7 @@ namespace flow
 {
     public partial class MainGameForm : Form
     {
+        public readonly string PATH = @"%USERPROFILE%\Documents\flow";
         public User UserPlayer { get; set; }
         public bool MouseIsDown { get; set; }
         public bool GridIsSet { get; set; }
@@ -18,13 +19,15 @@ namespace flow
         public Cell PrevCell { get; set; }
         public int UpDownStart { get; set; } // 1 up, -1 down
         public Timer Timer { get; set; }
-        public bool ExitForReal { get; set; } = true;
 
         public MainGameForm(User user)
         {
             InitializeComponent();
             this.DoubleBuffered = true;
             UserPlayer = user;
+            if (UserPlayer.MyGame.LevelGroup * UserPlayer.MyGame.LevelNumber == 0)
+                continueLabel.Visible = false;
+            PATH = Environment.ExpandEnvironmentVariables(PATH);
             Text = $"Flow - {UserPlayer.Name}";
             UserPlayer.MyGame.Grid.TimeElapsed = new TimeSpan();
         }
@@ -54,6 +57,7 @@ namespace flow
 
                 if (UserPlayer.MyGame.LevelGroup * UserPlayer.MyGame.LevelNumber != 0)
                 {
+                    continueLabel.Visible = false;
                     UserPlayer.MyGame.Grid =
                         UserPlayer.Levels.RegularLevels[UserPlayer.MyGame.LevelGroup][UserPlayer.MyGame.LevelNumber];
                     GridIsSet = true;
@@ -386,6 +390,9 @@ namespace flow
             connectedPipesLabel.Text = $"Flows: 0/{UserPlayer.MyGame.Grid.Paths.Count}";
             elapsedTimeLabel.Text = "Time: 00:00";
             pipeFinishedLabel.Text = $"Pipe: {UserPlayer.MyGame.Grid.FinishedPercent}%";
+            UserPlayer.ChangedSomething = true;
+            Text = $"Flow - {UserPlayer.Name}*";
+
             UserPlayer.MyGame.Grid.TimeElapsed = new TimeSpan();
             if (UserPlayer.IsLevelSolved(UserPlayer.MyGame.LevelGroup,UserPlayer.MyGame.LevelNumber))
                 UserPlayer.SolvedLevels[UserPlayer.MyGame.LevelGroup].Remove(UserPlayer.MyGame.LevelNumber);
@@ -393,17 +400,11 @@ namespace flow
             Invalidate();
         }
 
-        private void MainGameForm_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (ExitForReal)
-                Application.Exit();
-        }
-
         public void SaveFile()
         {
             string fileName = UserPlayer.Name;
             BinaryFormatter formatter = new BinaryFormatter();
-            using (FileStream file = File.Create("../../SaveGames/" + fileName + ".flw"))
+            using (FileStream file = File.Create($@"{PATH}\{fileName}.flw"))
                 formatter.Serialize(file, UserPlayer);
         }
 
@@ -418,10 +419,13 @@ namespace flow
                 {
                     var loginForm = new LoginForm();
                     loginForm.Show();
-                    ExitForReal = false;
                 }
             }
-
+            else
+            {
+                var loginForm = new LoginForm();
+                loginForm.Show();
+            }
         }
 
         private void saveButton_Click(object sender, EventArgs e)
@@ -438,7 +442,6 @@ namespace flow
             {
                 var loginForm = new LoginForm();
                 loginForm.Show();
-                ExitForReal = false;
             }
         }
     }

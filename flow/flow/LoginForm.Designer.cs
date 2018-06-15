@@ -33,6 +33,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.loginButton = new System.Windows.Forms.Button();
             this.completedLevelsLabel = new System.Windows.Forms.Label();
+            this.viewStatsButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // loginTextbox
@@ -83,6 +84,19 @@
             this.completedLevelsLabel.TabIndex = 3;
             this.completedLevelsLabel.Text = "Completed Levels: 0/150";
             // 
+            // viewStatsButton
+            // 
+            this.viewStatsButton.BackColor = System.Drawing.Color.Black;
+            this.viewStatsButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.viewStatsButton.ForeColor = System.Drawing.Color.White;
+            this.viewStatsButton.Location = new System.Drawing.Point(810, 369);
+            this.viewStatsButton.Name = "viewStatsButton";
+            this.viewStatsButton.Size = new System.Drawing.Size(301, 43);
+            this.viewStatsButton.TabIndex = 4;
+            this.viewStatsButton.Text = "View Stats";
+            this.viewStatsButton.UseVisualStyleBackColor = false;
+            this.viewStatsButton.Click += new System.EventHandler(this.viewStatsButton_Click);
+            // 
             // LoginForm
             // 
             this.AcceptButton = this.loginButton;
@@ -91,6 +105,7 @@
             this.BackgroundImage = global::flow.Properties.Resources.FLOW;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.ClientSize = new System.Drawing.Size(1123, 450);
+            this.Controls.Add(this.viewStatsButton);
             this.Controls.Add(this.completedLevelsLabel);
             this.Controls.Add(this.loginButton);
             this.Controls.Add(this.label1);
@@ -112,5 +127,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Button loginButton;
         private System.Windows.Forms.Label completedLevelsLabel;
+        private System.Windows.Forms.Button viewStatsButton;
     }
 }
