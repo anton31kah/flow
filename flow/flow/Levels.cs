@@ -2683,7 +2683,7 @@ namespace flow
             Color[] colorsFaded = { Color.LightCoral, Color.LightGreen, Color.LightBlue, Color.LightYellow, Color.LightSalmon };
             for (int i = 5; i <= 9; i++, width += 55)
             {
-                if (i == selectedGroup || solvedLevels.ContainsKey(selectedGroup) && solvedLevels[selectedGroup].Count == 30)
+                if (i == selectedGroup)
                     graphics.FillRectangle(new SolidBrush(colorsFaded[i - 5]), width, height, 50, 50);
 
                 graphics.DrawRectangle(new Pen(colors[i - 5], 1), width, height, 50, 50);
@@ -2691,8 +2691,18 @@ namespace flow
                 graphics.DrawString($"{i}", new Font("Arial", 15), new SolidBrush(colors[i - 5]), (float)(width + (25 - stringSize.Width / 2.0)), (float)(height + (25 - stringSize.Height / 2.0)));
             }
 
-            // draw levels
-            height = 160;
+			width = 750;
+			for (int i = 5; i <= 9; i++, width += 55)
+			{
+				if (solvedLevels.ContainsKey(i) && solvedLevels[i].Count == 30)
+					graphics.FillRectangle(new SolidBrush(colorsFaded[i - 5]), width, height, 50, 50);
+				graphics.DrawRectangle(new Pen(colors[i - 5], 1), width, height, 50, 50);
+				var stringSize = graphics.MeasureString($"{i}", new Font("Arial", 15));
+				graphics.DrawString($"{i}", new Font("Arial", 15), new SolidBrush(colors[i - 5]), (float)(width + (25 - stringSize.Width / 2.0)), (float)(height + (25 - stringSize.Height / 2.0)));
+			}
+
+			// draw levels
+			height = 160;
             width = 750;
             for (int i = 1; i <= 30; i++, width += 55)
             {
@@ -2701,9 +2711,11 @@ namespace flow
                 {
                     c = colorsFaded[selectedGroup - 5];
                     graphics.FillRectangle(new SolidBrush(colorsFaded[selectedGroup - 5]), width, height, 50, 50);
-                }
+				}
                 graphics.DrawRectangle(Pens.White, width, height, 50, 50);
-                var stringSize = graphics.MeasureString($"{i}", new Font("Arial", 15));
+				if (i == selectedLevel)
+					graphics.DrawRectangle(new Pen(colors[selectedGroup - 5], 2), width, height, 50, 50);
+				var stringSize = graphics.MeasureString($"{i}", new Font("Arial", 15));
                 var textColorBrush = c.R / 255.0 + c.G / 255.0 + c.B / 255.0 < 1.5 ? Brushes.White : Brushes.Black;
                 graphics.DrawString($"{i}", new Font("Arial", 15), textColorBrush, (float)(width + (25 - stringSize.Width / 2.0)), (float)(height + (25 - stringSize.Height / 2.0)));
 

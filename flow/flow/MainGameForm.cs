@@ -352,6 +352,31 @@ namespace flow
                         LastVisitedCell = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList
                             .AddAfter(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First, Cell);
 
+
+					if (UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Count >= 3 &&
+						Math.Abs(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First.Value.Row -
+								UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First.Next.Value.Row) +
+						Math.Abs(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First.Value.Col -
+								UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First.Next.Value.Col) == 1 &&
+						Math.Abs(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Last.Value.Row -
+								UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Last.Previous.Value.Row) +
+						Math.Abs(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Last.Value.Col -
+								UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Last.Previous.Value.Col) == 1)
+					{
+						UserPlayer.MyGame.Grid.CompletedPipes[UserPlayer.MyGame.FirstColor] = true;
+						UserPlayer.ChangedSomething = true;
+						Text = $"Flow - {UserPlayer.Name}*";
+
+						connectedPipesLabel.Text =
+							$"Flows: {UserPlayer.MyGame.Grid.CompletedPipes.Values.Count(v => v)}/{UserPlayer.MyGame.Grid.Paths.Count}";
+						if (UserPlayer.MyGame.Grid.CompletedPipes.Values.Count(v => v) == UserPlayer.MyGame.Grid.Paths.Count)
+						{
+							if (!UserPlayer.SolvedLevels.ContainsKey(UserPlayer.MyGame.LevelGroup))
+								UserPlayer.SolvedLevels[UserPlayer.MyGame.LevelGroup] = new HashSet<int>();
+							UserPlayer.SolvedLevels[UserPlayer.MyGame.LevelGroup].Add(UserPlayer.MyGame.LevelNumber);
+						}
+					}
+
                     UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].Update();
                     pipeFinishedLabel.Text = $"Pipe: {UserPlayer.MyGame.Grid.FinishedPercent}%";
 
@@ -386,8 +411,11 @@ namespace flow
 
         private void resetButton_Click(object sender, EventArgs e)
         {
+			if (MessageBox.Show("Are You Sure?", "Reset", MessageBoxButtons.YesNo) == DialogResult.No)
+				return;
             UserPlayer.Levels.RegularLevels[UserPlayer.MyGame.LevelGroup][UserPlayer.MyGame.LevelNumber].Reset();
-            connectedPipesLabel.Text = $"Flows: 0/{UserPlayer.MyGame.Grid.Paths.Count}";
+			UserPlayer.MyGame.Grid.CompletedPipes.Clear();
+			connectedPipesLabel.Text = $"Flows: 0/{UserPlayer.MyGame.Grid.Paths.Count}";
             elapsedTimeLabel.Text = "Time: 00:00";
             pipeFinishedLabel.Text = $"Pipe: {UserPlayer.MyGame.Grid.FinishedPercent}%";
             UserPlayer.ChangedSomething = true;
