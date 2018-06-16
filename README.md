@@ -20,7 +20,7 @@ When you start the application you see a splash screen. You need to enter a user
 
 On the main game screen, on the left side is positioned the grid where each level will be drawn and solved by you. In the middle, you can see the current game stats (flows, elapsed time, and completion percentage) and a few helping buttons (save reset current level, logout). On the right are the groups and levels from which you can choose. Your selection of the group and level is highlighted so you can see which level you are currently solving. The completed levels will stay highlighted and once you solve all 30 levels from one group, the group will also stay highlighted.
 
-Note: Save files are located in C:\Users\%your computer name%\Documents\flow\
+Note: Save files are located in C:\Users\\%your computer name%\Documents\flow\
 
 Everything starts with a simple Cell, we have two types of cells, Normal Cell, and Initial Cell. They contain their basic info, location, color, size and etc. Those cells are all grouped in a Grid, which contains info on how many cells are in it, and some info connected to its own cells. Multiple Grids make Levels, and multiple Levels with same grid size make a Group. All this is very precisely done and worked through. So the one property with the biggest data structure is the one where we store the levels. Its function tag is: `Dictionary<int, Dictionary<int, Grid>>`
 
