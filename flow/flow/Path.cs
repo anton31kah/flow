@@ -31,7 +31,9 @@ namespace flow
 
         public void Update()
         {
-            var current = PathList.First;
+			foreach (var cell in PathList)
+				cell.PipeDirection.Clear();
+			var current = PathList.First;
             for (int i = 0, size = PathList.Count; i < size - 1; i++)
             {
                 var next = current.Next;
