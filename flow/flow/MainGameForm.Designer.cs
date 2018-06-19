@@ -130,10 +130,10 @@
             this.Name = "MainGameForm";
             this.Text = "Flow - UserName";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainGameForm_FormClosing);
-            this.Paint += new System.Windows.Forms.PaintEventHandler(this.Form3_Paint);
-            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Form3_MouseDown);
-            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Form3_MouseMove);
-            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Form3_MouseUp);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.MainGameForm_Paint);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MainGameForm_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.MainGameForm_MouseMove);
+            this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.MainGameForm_MouseUp);
             this.ResumeLayout(false);
             this.PerformLayout();
 

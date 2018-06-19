@@ -14,16 +14,14 @@ namespace flow
         public User UserPlayer { get; set; }
         public bool MouseIsDown { get; set; }
         public bool GridIsSet { get; set; }
-        public int PreviousLevel { get; set; }
-        public LinkedListNode<Cell> LastVisitedCell { get; set; }
+		public LinkedListNode<Cell> LastVisitedCell { get; set; }
         public Cell PrevCell { get; set; }
-        public int UpDownStart { get; set; } // 1 up, -1 down
-        public Timer Timer { get; set; }
+		public Timer Timer { get; set; }
 
         public MainGameForm(User user)
         {
             InitializeComponent();
-            this.DoubleBuffered = true;
+            DoubleBuffered = true;
             UserPlayer = user;
             if (UserPlayer.MyGame.LevelGroup * UserPlayer.MyGame.LevelNumber == 0)
                 continueLabel.Visible = false;
@@ -32,7 +30,7 @@ namespace flow
             UserPlayer.MyGame.Grid.TimeElapsed = new TimeSpan();
         }
 
-        private void Form3_Paint(object sender, PaintEventArgs e)
+        private void MainGameForm_Paint(object sender, PaintEventArgs e)
         {
             e.Graphics.Clear(Color.Black);
             UserPlayer.MyGame.Grid.FormGraphics = e.Graphics;
@@ -42,7 +40,7 @@ namespace flow
 
         }
 
-        private void Form3_MouseDown(object sender, MouseEventArgs e)
+        private void MainGameForm_MouseDown(object sender, MouseEventArgs e)
         {
             if (e.X > 500) // level choosing
             {
@@ -87,7 +85,12 @@ namespace flow
             var Cell = UserPlayer.MyGame.Grid.GetCellUnderMouse(e.X, e.Y);
             if (Cell.Color == Color.Black)
                 return;
-            MouseIsDown = true;
+			if (UserPlayer.IsLevelSolved(UserPlayer.MyGame.LevelGroup, UserPlayer.MyGame.LevelNumber))
+			{ 
+				resetButton_Click(null, null);
+				return;
+			}
+			MouseIsDown = true;
             UserPlayer.MyGame.FirstColor = Cell.Color;
             LastVisitedCell = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].LastAddedCell;
             PrevCell = Cell;
@@ -137,12 +140,16 @@ namespace flow
                     Outside:
 
                     node = next;
-                    Invalidate();
                 }
-            }
+
+				UserPlayer.MyGame.Grid.CompletedPipes[UserPlayer.MyGame.FirstColor] = false;
+				connectedPipesLabel.Text =
+					$"Flows: {UserPlayer.MyGame.Grid.CompletedPipes.Values.Count(v => v)}/{UserPlayer.MyGame.Grid.Paths.Count}";
+				pipeFinishedLabel.Text = $"Pipe: {UserPlayer.MyGame.Grid.FinishedPercent}%";
+			}
             else if (UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Count > 2) // started
             {
-                if (UpDownStart == 1) // clear down
+                if (UserPlayer.MyGame.Grid.ColorUpDownStart[UserPlayer.MyGame.FirstColor] == 1) // clear down
                 {
                     var node = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Find(Cell)?.Next;
                     while (node?.Value is NormalCell)
@@ -195,28 +202,36 @@ namespace flow
                         node = prev;
                     }
                 }
-            }
+
+				UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].Update();
+				UserPlayer.MyGame.Grid.CompletedPipes[UserPlayer.MyGame.FirstColor] = false;
+				connectedPipesLabel.Text =
+					$"Flows: {UserPlayer.MyGame.Grid.CompletedPipes.Values.Count(v => v)}/{UserPlayer.MyGame.Grid.Paths.Count}";
+				pipeFinishedLabel.Text = $"Pipe: {UserPlayer.MyGame.Grid.FinishedPercent}%";
+			}
 
 
             if (Equals(Cell, UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First.Value))
-                UpDownStart = 1;
+				UserPlayer.MyGame.Grid.ColorUpDownStart[UserPlayer.MyGame.FirstColor] = 1;
             else if (Equals(Cell, UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Last.Value))
-                UpDownStart = -1;
-        }
+				UserPlayer.MyGame.Grid.ColorUpDownStart[UserPlayer.MyGame.FirstColor] = -1;
+
+			Invalidate();
+		}
 
         private void Timer_Tick(object sender, EventArgs e)
         {
             if (!UserPlayer.IsLevelSolved(UserPlayer.MyGame.LevelGroup, UserPlayer.MyGame.LevelNumber))
                 UserPlayer.MyGame.Grid.TimeElapsed += UserPlayer.MyGame.Grid.DefaultTick;
             elapsedTimeLabel.Text = $"Time: {UserPlayer.MyGame.Grid.TimeElapsed:mm\\:ss}";
-        }
+		}
 
-        private void Form3_MouseUp(object sender, MouseEventArgs e)
+        private void MainGameForm_MouseUp(object sender, MouseEventArgs e)
         {
             MouseIsDown = false;
         }
 
-        private void Form3_MouseMove(object sender, MouseEventArgs e)
+        private void MainGameForm_MouseMove(object sender, MouseEventArgs e)
         {
             if (MouseIsDown)
             {
@@ -224,8 +239,11 @@ namespace flow
 
                 Color beforeColor = Cell.Color;
 
-                // clear on touch another
-                if (beforeColor != Color.Black && beforeColor != UserPlayer.MyGame.FirstColor)
+				if (!UserPlayer.MyGame.Grid.AreAdjacent(PrevCell, Cell))
+					return; // why the heck was this between the two clears
+
+				// clear on touch another
+				if (beforeColor != Color.Black && beforeColor != UserPlayer.MyGame.FirstColor && Cell is NormalCell)
                 {
                     var node = UserPlayer.MyGame.Grid.Paths[beforeColor].PathList.First;
                     while (node != null)
@@ -270,21 +288,27 @@ namespace flow
                         Outside:
 
                         node = next;
-                        Invalidate();
+
                     }
-                }
 
-                if (!UserPlayer.MyGame.Grid.AreAdjacent(PrevCell, Cell))
-                    return;
+					UserPlayer.MyGame.Grid.CompletedPipes[beforeColor] = false;
+					connectedPipesLabel.Text =
+						$"Flows: {UserPlayer.MyGame.Grid.CompletedPipes.Values.Count(v => v)}/{UserPlayer.MyGame.Grid.Paths.Count}";
+					pipeFinishedLabel.Text = $"Pipe: {UserPlayer.MyGame.Grid.FinishedPercent}%";
+				}
 
-                if (Cell is NormalCell &&
+				// why the heck is this here
+				// if (!UserPlayer.MyGame.Grid.AreAdjacent(PrevCell, Cell)) return;
+
+				// clear half pipe from cell touched (when samo color)
+				if (Cell is NormalCell &&
                     beforeColor != Color.Black &&
                     beforeColor == UserPlayer.MyGame.FirstColor &&
                     UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Contains(Cell) &&
                     !Equals(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.First.Next?.Value, Cell) &&
                     !Equals(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Last.Previous?.Value, Cell))
                 {
-                    if (UpDownStart == 1) // clear down
+                    if (UserPlayer.MyGame.Grid.ColorUpDownStart[UserPlayer.MyGame.FirstColor] == 1) // clear down
                     {
                         var node = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Find(Cell)?.Next;
                         while (node?.Value is NormalCell)
@@ -337,7 +361,12 @@ namespace flow
                             node = prev;
                         }
                     }
-                }
+
+					UserPlayer.MyGame.Grid.CompletedPipes[UserPlayer.MyGame.FirstColor] = false;
+					connectedPipesLabel.Text =
+						$"Flows: {UserPlayer.MyGame.Grid.CompletedPipes.Values.Count(v => v)}/{UserPlayer.MyGame.Grid.Paths.Count}";
+					pipeFinishedLabel.Text = $"Pipe: {UserPlayer.MyGame.Grid.FinishedPercent}%";
+				}
 
 
 
@@ -345,7 +374,7 @@ namespace flow
                 {
                     Cell.Color = UserPlayer.MyGame.FirstColor;
 
-                    if (UpDownStart == 1)
+                    if (UserPlayer.MyGame.Grid.ColorUpDownStart[UserPlayer.MyGame.FirstColor] == 1)
                         LastVisitedCell = UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList
                             .AddBefore(UserPlayer.MyGame.Grid.Paths[UserPlayer.MyGame.FirstColor].PathList.Last, Cell);
                     else
@@ -381,7 +410,6 @@ namespace flow
                     pipeFinishedLabel.Text = $"Pipe: {UserPlayer.MyGame.Grid.FinishedPercent}%";
 
                     PrevCell = Cell;
-                    Invalidate();
                     Pipes.Graphics = UserPlayer.MyGame.Grid.FormGraphics;
 
                 }
@@ -404,8 +432,9 @@ namespace flow
                         UserPlayer.SolvedLevels[UserPlayer.MyGame.LevelGroup].Add(UserPlayer.MyGame.LevelNumber);
                     }
 
-                    Invalidate();
                 }
+
+				Invalidate();
             }
         }
 
