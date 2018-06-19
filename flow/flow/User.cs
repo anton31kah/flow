@@ -7,13 +7,14 @@ namespace flow
     [Serializable]
     public class User
     {
-        [NonSerialized] private bool _changedSomething = false;
+        [NonSerialized] private bool _changedSomething;
 
         public Levels Levels { get; set; }
         public Game MyGame { get; set; }
         public string Name { get; set; }
         public Dictionary<int, HashSet<int>> SolvedLevels { get; set; } = new Dictionary<int, HashSet<int>>();
         public int CompletedLevels => SolvedLevels.Values.Sum(s => s.Count);
+
         public bool ChangedSomething
         {
             get => _changedSomething;

@@ -19,11 +19,11 @@ namespace flow
     public static class Pipes
     {
         public static Graphics Graphics { get; set; }
-        private static readonly Pen _pen = new Pen(Color.YellowGreen, 2);
+        private static readonly Pen Pen = new Pen(Color.YellowGreen, 2);
 
         public static void Border(int x, int y, int width, int height)
         {
-            Graphics.DrawRectangle(_pen, new Rectangle(x, y, width, height));
+            Graphics.DrawRectangle(Pen, new Rectangle(x, y, width, height));
         }
 
         public static void Big(int x, int y, int width, int height, Color color)

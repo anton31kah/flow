@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
@@ -83,7 +82,7 @@ namespace flow
             foreach (var file in files)
                 if (file.EndsWith(".flw"))
                 {
-                    User user = null;
+                    User user;
                     BinaryFormatter formatter = new BinaryFormatter();
                     using (FileStream fileStream = File.OpenRead(file))
                         user = (User)formatter.Deserialize(fileStream);
