@@ -1,4 +1,4 @@
-# flow
+# <img src="https://github.com/anton31kah/flow/blob/master/flow/flow/Resources/flowicon_7tJ_icon.ico" alt="icon" width="24px"/> flow
 
 ## by [Anton Kahwaji 161555](https://github.com/anton31kah) and [Oliver Dimitriov 161535](https://github.com/voirtimid)
 
