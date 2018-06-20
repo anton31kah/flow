@@ -24,7 +24,9 @@ namespace flow
                 statsListView.Sorting = SortOrder.Ascending;
             }
             else
-                statsListView.Sorting = statsListView.Sorting == SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending;
+                statsListView.Sorting = statsListView.Sorting == SortOrder.Ascending
+                                            ? SortOrder.Descending
+                                            : SortOrder.Ascending;
 
             statsListView.Sort();
             statsListView.ListViewItemSorter = new ListViewItemComparer(e.Column, statsListView.Sorting);
@@ -54,9 +56,11 @@ namespace flow
             bool tryParse = int.TryParse(((ListViewItem) x)?.SubItems[col].Text, out int _);
             if (tryParse)
                 returnVal = Int32.Parse(((ListViewItem) x)?.SubItems[col].Text ?? throw new InvalidOperationException())
-                    .CompareTo(Int32.Parse(((ListViewItem) y)?.SubItems[col].Text ?? throw new InvalidOperationException()));
+                                 .CompareTo(Int32.Parse(((ListViewItem) y)?.SubItems[col].Text ??
+                                                        throw new InvalidOperationException()));
             else
-                returnVal = String.CompareOrdinal(((ListViewItem) x)?.SubItems[col].Text, ((ListViewItem) y)?.SubItems[col].Text);
+                returnVal = String.CompareOrdinal(((ListViewItem) x)?.SubItems[col].Text,
+                                                  ((ListViewItem) y)?.SubItems[col].Text);
 
             if (order == SortOrder.Descending)
                 returnVal *= -1;

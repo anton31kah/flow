@@ -10,7 +10,6 @@ namespace flow
         // x -> col
         // y -> row
 
-
         public Color Color { get; set; }
         public int NumberOfPipes { get; set; }
         public Point Point { get; set; }
@@ -23,7 +22,6 @@ namespace flow
         public bool IsConnected { get; set; }
         public Queue<PipeDirection> PipeDirection { get; set; }
 
-
         protected Cell(int row, int col, int countInRowCol, int maxWidthHeight, Color color)
         {
             Row = row;
@@ -31,7 +29,7 @@ namespace flow
             CountInRowCol = countInRowCol;
             MaxWidthHeight = maxWidthHeight;
             Color = color;
-            Point = new Point { X = Col * MaxWidthHeight / CountInRowCol, Y = Row * MaxWidthHeight / CountInRowCol };
+            Point = new Point {X = Col * MaxWidthHeight / CountInRowCol, Y = Row * MaxWidthHeight / CountInRowCol};
             Width = Height = MaxWidthHeight / CountInRowCol;
         }
 
@@ -56,6 +54,7 @@ namespace flow
             var hashCode = 1084646500;
             hashCode = hashCode * -1521134295 + Row.GetHashCode();
             hashCode = hashCode * -1521134295 + Col.GetHashCode();
+
             return hashCode;
         }
 

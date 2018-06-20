@@ -8,7 +8,11 @@ namespace flow
     [Serializable]
     public class InitialCell : Cell
     {
-        public InitialCell(int row, int col, int countInRowCol, int maxWidthHeight, Color color) : base(row, col, countInRowCol, maxWidthHeight, color)
+        public InitialCell(int row, int col, int countInRowCol, int maxWidthHeight, Color color) : base(row,
+                                                                                                        col,
+                                                                                                        countInRowCol,
+                                                                                                        maxWidthHeight,
+                                                                                                        color)
         {
             PipeDirection = new Queue<PipeDirection>(1);
             NumberOfPipes = 1;
@@ -16,9 +20,9 @@ namespace flow
 
         public override void Draw(Graphics formGraphics)
         {
-
             Pipes.Graphics = formGraphics;
             Pipes.Big(Point.X, Point.Y, Width, Height, Color);
+
             if (PipeDirection.Any())
             {
                 switch (PipeDirection.Peek())
@@ -26,24 +30,30 @@ namespace flow
                     case flow.PipeDirection.Medium:
                         Pipes.Medium(Point.X, Point.Y, Width, Height, Color);
                         NumberOfPipes++;
+
                         break;
                     case flow.PipeDirection.Up:
                         Pipes.Up(Point.X, Point.Y, Width, Height, Color);
                         NumberOfPipes++;
+
                         break;
                     case flow.PipeDirection.Down:
                         Pipes.Down(Point.X, Point.Y, Width, Height, Color);
                         NumberOfPipes++;
+
                         break;
                     case flow.PipeDirection.Left:
                         Pipes.Left(Point.X, Point.Y, Width, Height, Color);
                         NumberOfPipes++;
+
                         break;
                     case flow.PipeDirection.Right:
                         Pipes.Right(Point.X, Point.Y, Width, Height, Color);
                         NumberOfPipes++;
+
                         break;
                     default:
+
                         throw new ArgumentOutOfRangeException();
                 }
             }
