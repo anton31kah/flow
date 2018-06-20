@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 using System.IO;
@@ -29,8 +28,10 @@ namespace flow
         private void loginButton_Click(object sender, EventArgs e)
         {
             string fileName = loginTextbox.Text;
+
             if (String.IsNullOrWhiteSpace(fileName))
                 return;
+
             if (loginButton.Text == "Continue Game")
             {
                 if (User == null)
@@ -40,6 +41,7 @@ namespace flow
             {
                 User = new User(fileName);
             }
+
             var mainGameForm = new MainGameForm(User);
             mainGameForm.Show();
             GameStarted = true;
@@ -56,6 +58,7 @@ namespace flow
         {
             if (String.IsNullOrWhiteSpace(loginTextbox.Text)) return;
             var files = Directory.GetFiles(PATH).Select(f => IOPath.GetFileNameWithoutExtension(f)).ToArray();
+
             if (files.Contains(loginTextbox.Text))
             {
                 loginButton.Text = "Continue Game";
@@ -72,7 +75,7 @@ namespace flow
             {
                 BinaryFormatter formatter = new BinaryFormatter();
                 using (FileStream file = File.OpenRead($@"{PATH}\{fileName}.flw"))
-                    User = (User)formatter.Deserialize(file);
+                    User = (User) formatter.Deserialize(file);
             }
         }
 
@@ -80,15 +83,17 @@ namespace flow
         {
             Dictionary<string, int> stats = new Dictionary<string, int>();
             var files = Directory.GetFiles(PATH);
+
             foreach (var file in files)
                 if (file.EndsWith(".flw"))
                 {
-                    User user = null;
+                    User user;
                     BinaryFormatter formatter = new BinaryFormatter();
                     using (FileStream fileStream = File.OpenRead(file))
-                        user = (User)formatter.Deserialize(fileStream);
+                        user = (User) formatter.Deserialize(fileStream);
                     stats[IOPath.GetFileNameWithoutExtension(file)] = user.CompletedLevels;
                 }
+
             StatsForm statsForm = new StatsForm(stats);
             statsForm.ShowDialog();
         }
